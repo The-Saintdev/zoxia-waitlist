@@ -1,19 +1,26 @@
 /**
  * ZOXIA Cloudflare Worker — Full-Stack Edge Handler + Static Assets
- * Handles /api/waitlist, /api/health, and serves public static assets
+ * Integrates with Mailjet Send API v3.1 with real payload inspection and live test endpoint
  */
 
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-
-    // Extract keys supporting both separate variables and single MAILJET_CREDENTIALS secret
     const { apiKey, secretKey, fromEmail } = getMailjetConfig(env);
 
-    // 1. Health Check: GET /api/health
+    // 1. Diagnostic Test Email Endpoint: GET /api/test-email?to=user@example.com
+    if (url.pathname === '/api/test-email') {
+      const recipient = url.searchParams.get('to') || 'test@example.com';
+      const testResult = await executeMailjetSend(apiKey, secretKey, fromEmail, recipient);
+      return new Response(JSON.stringify(testResult, null, 2), {
+        status: testResult.ok ? 200 : 400,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      });
+    }
+
+    // 2. Health Check: GET /api/health
     if (url.pathname === '/api/health') {
       const availableKeys = env ? Object.keys(env) : [];
-
       return new Response(JSON.stringify({
         status: 'online',
         hasMailjetKey: !!apiKey,
@@ -23,14 +30,11 @@ export default {
         timestamp: new Date().toISOString(),
       }), {
         status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
       });
     }
 
-    // 2. Waitlist Submission: POST /api/waitlist
+    // 3. Waitlist Submission: POST /api/waitlist
     if (url.pathname === '/api/waitlist') {
       if (request.method === 'OPTIONS') {
         return new Response(null, {
@@ -53,7 +57,7 @@ export default {
       });
     }
 
-    // 3. Serve Static Assets
+    // 4. Serve Static Assets
     if (env.ASSETS) {
       return env.ASSETS.fetch(request);
     }
@@ -63,14 +67,13 @@ export default {
 };
 
 /**
- * Extracts Mailjet configuration from environment supporting single or separate secrets
+ * Extracts Mailjet configuration supporting single or separate secrets
  */
 function getMailjetConfig(env) {
   let apiKey = env?.MAILJET_API_KEY || env?.MAILJET_PUBLIC_KEY || env?.API_KEY || '';
   let secretKey = env?.MAILJET_SECRET_KEY || env?.MAILJET_PRIVATE_KEY || env?.SECRET_KEY || '';
-  const fromEmail = env?.SMTP_FROM || env?.MAILJET_FROM || 'noreply@zoxia.site';
+  const fromEmail = env?.SMTP_FROM || env?.MAILJET_FROM || env?.MAILJET_SENDER || 'noreply@zoxia.site';
 
-  // Support single unified secret: MAILJET_CREDENTIALS = "API_KEY:SECRET_KEY"
   if (env?.MAILJET_CREDENTIALS && env.MAILJET_CREDENTIALS.includes(':')) {
     const parts = env.MAILJET_CREDENTIALS.trim().split(':');
     apiKey = parts[0].trim();
@@ -81,7 +84,69 @@ function getMailjetConfig(env) {
 }
 
 /**
- * Handles waitlist form submission and sends Mailjet confirmation email
+ * Executes Mailjet API v3.1 call and inspects deep message status
+ */
+async function executeMailjetSend(apiKey, secretKey, fromEmail, recipientEmail) {
+  if (!apiKey || !secretKey) {
+    return {
+      ok: false,
+      error: 'Mailjet API credentials missing from environment variables',
+      config: { hasApiKey: !!apiKey, hasSecretKey: !!secretKey, fromEmail },
+    };
+  }
+
+  const welcomeEmailHtml = generateWelcomeEmailHtml(recipientEmail);
+  const authHeader = 'Basic ' + btoa(`${apiKey.trim()}:${secretKey.trim()}`);
+
+  try {
+    const mailjetRes = await fetch('https://api.mailjet.com/v3.1/send', {
+      method: 'POST',
+      headers: {
+        'Authorization': authHeader,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        Messages: [
+          {
+            From: {
+              Email: fromEmail,
+              Name: 'Zoxia',
+            },
+            To: [
+              {
+                Email: recipientEmail,
+              }
+            ],
+            Subject: "You're on the Zoxia waitlist! 👀",
+            TextPart: `You're on the Zoxia waitlist!\n\nThanks for signing up for early access to Zoxia.\n\nWe'll email you the moment your early-access spot is ready.\n\n— The Zoxia Team\nZoxia by Cresco Ai LTD · https://zoxia.site`,
+            HTMLPart: welcomeEmailHtml,
+          }
+        ]
+      }),
+    });
+
+    const data = await mailjetRes.json().catch(() => ({}));
+    const messageStatus = data?.Messages?.[0]?.Status;
+    const isSuccess = mailjetRes.ok && messageStatus === 'success';
+
+    return {
+      ok: isSuccess,
+      httpStatus: mailjetRes.status,
+      messageStatus: messageStatus || 'unknown',
+      fromEmailUsed: fromEmail,
+      recipientUsed: recipientEmail,
+      mailjetRawResponse: data,
+    };
+  } catch (err) {
+    return {
+      ok: false,
+      error: 'Mailjet Network Exception: ' + err.message,
+    };
+  }
+}
+
+/**
+ * Handles waitlist form submission
  */
 async function handleWaitlistSubmission(request, env, apiKey, secretKey, fromEmail) {
   const corsHeaders = {
@@ -104,92 +169,24 @@ async function handleWaitlistSubmission(request, env, apiKey, secretKey, fromEma
       });
     }
 
-    // Store in KV if available
+    // Persist to KV if present
     if (env && env.WAITLIST_KV) {
       try {
         const clientIp = request.headers.get('CF-Connecting-IP') || '';
         const country = request.headers.get('CF-IPCountry') || '';
         await env.WAITLIST_KV.put(`waitlist:${email}`, JSON.stringify({
-          email,
-          role,
-          source,
-          submittedAt,
-          ip: clientIp,
-          country,
+          email, role, source, submittedAt, ip: clientIp, country,
         }));
-      } catch (kvErr) {
-        console.error('[KV Error]:', kvErr);
-      }
+      } catch (e) {}
     }
 
-    // Send Confirmation Email via Mailjet API v3.1
-    let emailSent = false;
-    let mailjetDebug = null;
-    const fromName = 'Zoxia';
-
-    if (apiKey && secretKey) {
-      const welcomeEmailHtml = generateWelcomeEmailHtml(email);
-      const authHeader = 'Basic ' + btoa(`${apiKey.trim()}:${secretKey.trim()}`);
-
-      try {
-        const mailjetRes = await fetch('https://api.mailjet.com/v3.1/send', {
-          method: 'POST',
-          headers: {
-            'Authorization': authHeader,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            Messages: [
-              {
-                From: {
-                  Email: fromEmail,
-                  Name: fromName,
-                },
-                To: [
-                  {
-                    Email: email,
-                  }
-                ],
-                Subject: "You're on the Zoxia waitlist! 👀",
-                TextPart: `You're on the Zoxia waitlist!\n\nThanks for signing up for early access to Zoxia.\n\nWe're currently building and testing Zoxia with an early cohort of creators and businesses.\n\nWe'll email you the moment your early-access spot is ready.\n\n— The Zoxia Team\nZoxia by Cresco Ai LTD · https://zoxia.site`,
-                HTMLPart: welcomeEmailHtml,
-              }
-            ]
-          }),
-        });
-
-        const resText = await mailjetRes.text();
-        if (mailjetRes.ok) {
-          emailSent = true;
-          mailjetDebug = 'Delivered to Mailjet queue';
-        } else {
-          console.error('[Mailjet API Error]:', mailjetRes.status, resText);
-          mailjetDebug = `Mailjet returned status ${mailjetRes.status}: ${resText}`;
-        }
-      } catch (fetchErr) {
-        console.error('[Mailjet Fetch Exception]:', fetchErr);
-        mailjetDebug = `Mailjet fetch error: ${fetchErr.message}`;
-      }
-    } else {
-      mailjetDebug = 'Mailjet API key or secret missing';
-      console.warn('[Zoxia Worker]:', mailjetDebug);
-    }
-
-    // Optional Admin Webhook
-    if (env && env.WAITLIST_WEBHOOK_URL) {
-      await fetch(env.WAITLIST_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content: `🎉 **New Zoxia Waitlist Signup!**\n**Email**: \`${email}\`\n**Role**: \`${role}\`\n**Mailjet Status**: \`${emailSent ? 'Sent' : 'Failed (' + mailjetDebug + ')'}\``,
-        }),
-      }).catch(() => {});
-    }
+    // Execute Email Send
+    const sendResult = await executeMailjetSend(apiKey, secretKey, fromEmail, email);
 
     return new Response(JSON.stringify({
       success: true,
-      emailSent,
-      mailjetDebug,
+      emailSent: sendResult.ok,
+      mailjetResult: sendResult,
       message: "You're on the list. 👀",
     }), {
       status: 200,
@@ -197,7 +194,6 @@ async function handleWaitlistSubmission(request, env, apiKey, secretKey, fromEma
     });
 
   } catch (err) {
-    console.error('[Worker Error]:', err);
     return new Response(JSON.stringify({ error: 'Failed to process waitlist request: ' + err.message }), {
       status: 500,
       headers: corsHeaders,
@@ -206,7 +202,7 @@ async function handleWaitlistSubmission(request, env, apiKey, secretKey, fromEma
 }
 
 /**
- * Zoxia Branded Welcome Email HTML Template
+ * Zoxia Welcome Email HTML Template
  */
 function generateWelcomeEmailHtml(userEmail) {
   return `
@@ -222,8 +218,6 @@ function generateWelcomeEmailHtml(userEmail) {
     <tr>
       <td align="center">
         <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background-color:#111317;border-radius:16px;padding:40px 32px;border:1px solid rgba(255,255,255,0.08);box-shadow:0 24px 60px rgba(0,0,0,0.6);">
-          
-          <!-- Logo & Brand Header -->
           <tr>
             <td align="left" style="padding-bottom:28px;">
               <table cellpadding="0" cellspacing="0">
@@ -236,8 +230,6 @@ function generateWelcomeEmailHtml(userEmail) {
               </table>
             </td>
           </tr>
-
-          <!-- Heading -->
           <tr>
             <td style="padding-bottom:18px;">
               <h1 style="font-size:26px;font-weight:800;letter-spacing:-0.5px;line-height:1.2;color:#FAFAF7;margin:0;">
@@ -245,8 +237,6 @@ function generateWelcomeEmailHtml(userEmail) {
               </h1>
             </td>
           </tr>
-
-          <!-- Body Message -->
           <tr>
             <td style="padding-bottom:24px;">
               <p style="font-size:15px;line-height:1.6;color:#9CA0A7;margin:0 0 16px 0;">
@@ -260,8 +250,6 @@ function generateWelcomeEmailHtml(userEmail) {
               </p>
             </td>
           </tr>
-
-          <!-- Workflow Loop -->
           <tr>
             <td style="padding:18px;background-color:rgba(0,0,0,0.4);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
               <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:#EB7600;margin-bottom:4px;">THE ZOXIA WORKFLOW</div>
@@ -270,8 +258,6 @@ function generateWelcomeEmailHtml(userEmail) {
               </div>
             </td>
           </tr>
-
-          <!-- Footer -->
           <tr>
             <td style="padding-top:32px;border-top:1px solid rgba(255,255,255,0.06);margin-top:28px;">
               <p style="font-size:12px;line-height:18px;color:#62666E;margin:0;text-align:center;">
@@ -280,7 +266,6 @@ function generateWelcomeEmailHtml(userEmail) {
               </p>
             </td>
           </tr>
-
         </table>
       </td>
     </tr>
