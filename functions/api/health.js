@@ -6,11 +6,16 @@
 export async function onRequestGet(context) {
   const { env } = context;
 
-  const apiKey = env?.MAILJET_API_KEY || env?.MAILJET_PUBLIC_KEY || env?.MAILJET_KEY || env?.MJ_APIKEY_PUBLIC || env?.API_KEY;
-  const secretKey = env?.MAILJET_SECRET_KEY || env?.MAILJET_PRIVATE_KEY || env?.MAILJET_SECRET || env?.MJ_APIKEY_PRIVATE || env?.SECRET_KEY;
-  const fromEmail = env?.SMTP_FROM || env?.MAILJET_FROM || env?.MAILJET_SENDER || env?.SENDER_EMAIL || 'noreply@zoxia.site';
+  let apiKey = env?.MAILJET_API_KEY || env?.MAILJET_PUBLIC_KEY || env?.API_KEY || '';
+  let secretKey = env?.MAILJET_SECRET_KEY || env?.MAILJET_PRIVATE_KEY || env?.SECRET_KEY || '';
+  const fromEmail = env?.SMTP_FROM || env?.MAILJET_FROM || 'noreply@zoxia.site';
 
-  // List all available env keys (names only, no secrets exposed)
+  if (env?.MAILJET_CREDENTIALS && env.MAILJET_CREDENTIALS.includes(':')) {
+    const parts = env.MAILJET_CREDENTIALS.trim().split(':');
+    apiKey = parts[0].trim();
+    secretKey = parts[1].trim();
+  }
+
   const availableEnvKeys = env ? Object.keys(env) : [];
 
   return new Response(JSON.stringify({

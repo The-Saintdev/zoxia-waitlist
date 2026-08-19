@@ -7,11 +7,11 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-    // 1. Health & Diagnostic Check: GET /api/health
+    // Extract keys supporting both separate variables and single MAILJET_CREDENTIALS secret
+    const { apiKey, secretKey, fromEmail } = getMailjetConfig(env);
+
+    // 1. Health Check: GET /api/health
     if (url.pathname === '/api/health') {
-      const apiKey = env?.MAILJET_API_KEY || env?.MAILJET_PUBLIC_KEY || env?.API_KEY;
-      const secretKey = env?.MAILJET_SECRET_KEY || env?.MAILJET_PRIVATE_KEY || env?.SECRET_KEY;
-      const fromEmail = env?.SMTP_FROM || env?.MAILJET_FROM || 'noreply@zoxia.site';
       const availableKeys = env ? Object.keys(env) : [];
 
       return new Response(JSON.stringify({
@@ -44,7 +44,7 @@ export default {
       }
 
       if (request.method === 'POST') {
-        return handleWaitlistSubmission(request, env);
+        return handleWaitlistSubmission(request, env, apiKey, secretKey, fromEmail);
       }
 
       return new Response(JSON.stringify({ error: 'Method not allowed' }), {
@@ -53,7 +53,7 @@ export default {
       });
     }
 
-    // 3. Serve Static Assets (HTML, CSS, JS, Images from public directory)
+    // 3. Serve Static Assets
     if (env.ASSETS) {
       return env.ASSETS.fetch(request);
     }
@@ -63,9 +63,27 @@ export default {
 };
 
 /**
+ * Extracts Mailjet configuration from environment supporting single or separate secrets
+ */
+function getMailjetConfig(env) {
+  let apiKey = env?.MAILJET_API_KEY || env?.MAILJET_PUBLIC_KEY || env?.API_KEY || '';
+  let secretKey = env?.MAILJET_SECRET_KEY || env?.MAILJET_PRIVATE_KEY || env?.SECRET_KEY || '';
+  const fromEmail = env?.SMTP_FROM || env?.MAILJET_FROM || 'noreply@zoxia.site';
+
+  // Support single unified secret: MAILJET_CREDENTIALS = "API_KEY:SECRET_KEY"
+  if (env?.MAILJET_CREDENTIALS && env.MAILJET_CREDENTIALS.includes(':')) {
+    const parts = env.MAILJET_CREDENTIALS.trim().split(':');
+    apiKey = parts[0].trim();
+    secretKey = parts[1].trim();
+  }
+
+  return { apiKey, secretKey, fromEmail };
+}
+
+/**
  * Handles waitlist form submission and sends Mailjet confirmation email
  */
-async function handleWaitlistSubmission(request, env) {
+async function handleWaitlistSubmission(request, env, apiKey, secretKey, fromEmail) {
   const corsHeaders = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
@@ -107,15 +125,11 @@ async function handleWaitlistSubmission(request, env) {
     // Send Confirmation Email via Mailjet API v3.1
     let emailSent = false;
     let mailjetDebug = null;
-
-    const mailjetApiKey = env?.MAILJET_API_KEY || env?.MAILJET_PUBLIC_KEY || env?.API_KEY;
-    const mailjetSecretKey = env?.MAILJET_SECRET_KEY || env?.MAILJET_PRIVATE_KEY || env?.SECRET_KEY;
-    const fromEmail = env?.SMTP_FROM || env?.MAILJET_FROM || 'noreply@zoxia.site';
     const fromName = 'Zoxia';
 
-    if (mailjetApiKey && mailjetSecretKey) {
+    if (apiKey && secretKey) {
       const welcomeEmailHtml = generateWelcomeEmailHtml(email);
-      const authHeader = 'Basic ' + btoa(`${mailjetApiKey.trim()}:${mailjetSecretKey.trim()}`);
+      const authHeader = 'Basic ' + btoa(`${apiKey.trim()}:${secretKey.trim()}`);
 
       try {
         const mailjetRes = await fetch('https://api.mailjet.com/v3.1/send', {
@@ -157,7 +171,7 @@ async function handleWaitlistSubmission(request, env) {
         mailjetDebug = `Mailjet fetch error: ${fetchErr.message}`;
       }
     } else {
-      mailjetDebug = 'MAILJET_API_KEY or MAILJET_SECRET_KEY missing in environment variables';
+      mailjetDebug = 'Mailjet API key or secret missing';
       console.warn('[Zoxia Worker]:', mailjetDebug);
     }
 
