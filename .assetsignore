@@ -1,7 +1,0 @@
-_worker.js
-wrangler.toml
-README.md
-.git
-.gitignore
-.assetsignore
-functions
