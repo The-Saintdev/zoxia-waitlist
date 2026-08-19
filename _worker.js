@@ -1,6 +1,6 @@
 /**
  * ZOXIA _worker.js — Universal Cloudflare Edge Worker & Static Asset Handler
- * Handles static assets and POST /api/waitlist with Mailjet email dispatch
+ * Integrates with Mailjet Send API v3.1 with detailed diagnostics
  */
 
 export default {
@@ -9,7 +9,7 @@ export default {
 
     // 1. Handle Waitlist API Endpoint: POST /api/waitlist
     if (url.pathname === '/api/waitlist') {
-      // Handle CORS Preflight
+      // CORS Preflight
       if (request.method === 'OPTIONS') {
         return new Response(null, {
           status: 204,
@@ -31,7 +31,21 @@ export default {
       });
     }
 
-    // 2. For all other routes, serve static assets (HTML, CSS, JS, Images)
+    // 2. Health & Diagnostic Check: GET /api/health
+    if (url.pathname === '/api/health') {
+      return new Response(JSON.stringify({
+        status: 'online',
+        hasMailjetKey: !!env?.MAILJET_API_KEY,
+        hasMailjetSecret: !!env?.MAILJET_SECRET_KEY,
+        fromEmail: env?.SMTP_FROM || env?.MAILJET_FROM || 'noreply@zoxia.site',
+        timestamp: new Date().toISOString(),
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      });
+    }
+
+    // 3. Serve static assets
     if (env.ASSETS) {
       return env.ASSETS.fetch(request);
     }
@@ -52,7 +66,8 @@ async function handleWaitlistSubmission(request, env) {
   try {
     const body = await request.json();
     const email = body.email ? body.email.trim().toLowerCase() : '';
-    const source = body.source || 'hero_form';
+    const role = body.role || 'Unspecified';
+    const source = body.source || 'hero';
     const submittedAt = body.submittedAt || new Date().toISOString();
 
     // Validate email
@@ -64,21 +79,28 @@ async function handleWaitlistSubmission(request, env) {
       });
     }
 
-    // 1. Persist to Cloudflare KV Database if connected
+    // 1. Store in Cloudflare KV if bound
     if (env && env.WAITLIST_KV) {
-      const clientIp = request.headers.get('CF-Connecting-IP') || '';
-      const country = request.headers.get('CF-IPCountry') || '';
-      await env.WAITLIST_KV.put(`waitlist:${email}`, JSON.stringify({
-        email,
-        source,
-        submittedAt,
-        ip: clientIp,
-        country,
-      }));
+      try {
+        const clientIp = request.headers.get('CF-Connecting-IP') || '';
+        const country = request.headers.get('CF-IPCountry') || '';
+        await env.WAITLIST_KV.put(`waitlist:${email}`, JSON.stringify({
+          email,
+          role,
+          source,
+          submittedAt,
+          ip: clientIp,
+          country,
+        }));
+      } catch (kvErr) {
+        console.error('[KV Error]:', kvErr);
+      }
     }
 
-    // 2. Send Automated Confirmation Email via Mailjet API v3.1
+    // 2. Dispatch Confirmation Email via Mailjet API v3.1
     let emailSent = false;
+    let mailjetDebug = null;
+
     const mailjetApiKey = env?.MAILJET_API_KEY;
     const mailjetSecretKey = env?.MAILJET_SECRET_KEY;
     const fromEmail = env?.SMTP_FROM || env?.MAILJET_FROM || 'noreply@zoxia.site';
@@ -86,49 +108,59 @@ async function handleWaitlistSubmission(request, env) {
 
     if (mailjetApiKey && mailjetSecretKey) {
       const welcomeEmailHtml = generateWelcomeEmailHtml(email);
-      const authHeader = 'Basic ' + btoa(`${mailjetApiKey}:${mailjetSecretKey}`);
+      const authHeader = 'Basic ' + btoa(`${mailjetApiKey.trim()}:${mailjetSecretKey.trim()}`);
 
-      const mailjetRes = await fetch('https://api.mailjet.com/v3.1/send', {
-        method: 'POST',
-        headers: {
-          'Authorization': authHeader,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          Messages: [
-            {
-              From: {
-                Email: fromEmail,
-                Name: fromName,
-              },
-              To: [
-                {
-                  Email: email,
-                }
-              ],
-              Subject: "You're on the Zoxia waitlist! 👀",
-              TextPart: `You're on the Zoxia waitlist!\n\nThanks for signing up for early access to Zoxia.\n\nWe're currently building and testing Zoxia with an early cohort of creators and businesses.\n\nWe'll email you the moment your early-access spot is ready.\n\n— The Zoxia Team\nZoxia by Cresco Ai LTD · https://zoxia.site`,
-              HTMLPart: welcomeEmailHtml,
-            }
-          ]
-        }),
-      });
+      try {
+        const mailjetRes = await fetch('https://api.mailjet.com/v3.1/send', {
+          method: 'POST',
+          headers: {
+            'Authorization': authHeader,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            Messages: [
+              {
+                From: {
+                  Email: fromEmail,
+                  Name: fromName,
+                },
+                To: [
+                  {
+                    Email: email,
+                  }
+                ],
+                Subject: "You're on the Zoxia waitlist! 👀",
+                TextPart: `You're on the Zoxia waitlist!\n\nThanks for signing up for early access to Zoxia.\n\nWe're currently building and testing Zoxia with an early cohort of creators and businesses.\n\nWe'll email you the moment your early-access spot is ready.\n\n— The Zoxia Team\nZoxia by Cresco Ai LTD · https://zoxia.site`,
+                HTMLPart: welcomeEmailHtml,
+              }
+            ]
+          }),
+        });
 
-      if (mailjetRes.ok) {
-        emailSent = true;
-      } else {
-        const errText = await mailjetRes.text();
-        console.error('[Mailjet Error]:', mailjetRes.status, errText);
+        const resText = await mailjetRes.text();
+        if (mailjetRes.ok) {
+          emailSent = true;
+          mailjetDebug = 'Delivered to Mailjet queue';
+        } else {
+          console.error('[Mailjet API Error]:', mailjetRes.status, resText);
+          mailjetDebug = `Mailjet returned status ${mailjetRes.status}: ${resText}`;
+        }
+      } catch (fetchErr) {
+        console.error('[Mailjet Fetch Exception]:', fetchErr);
+        mailjetDebug = `Mailjet fetch error: ${fetchErr.message}`;
       }
+    } else {
+      mailjetDebug = 'MAILJET_API_KEY or MAILJET_SECRET_KEY missing in Cloudflare environment variables';
+      console.warn('[Zoxia Worker]:', mailjetDebug);
     }
 
-    // 3. Optional: Forward to Discord/Slack webhook
+    // 3. Optional Admin Webhook
     if (env && env.WAITLIST_WEBHOOK_URL) {
       await fetch(env.WAITLIST_WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          content: `🎉 **New Zoxia Waitlist Signup!**\n**Email**: \`${email}\`\n**Source**: \`${source}\``,
+          content: `🎉 **New Zoxia Waitlist Signup!**\n**Email**: \`${email}\`\n**Role**: \`${role}\`\n**Mailjet Status**: \`${emailSent ? 'Sent' : 'Failed (' + mailjetDebug + ')'}\``,
         }),
       }).catch(() => {});
     }
@@ -136,14 +168,16 @@ async function handleWaitlistSubmission(request, env) {
     return new Response(JSON.stringify({
       success: true,
       emailSent,
-      message: "You're on the list. Check your inbox for confirmation!",
+      mailjetDebug,
+      message: "You're on the list. 👀",
     }), {
       status: 200,
       headers: corsHeaders,
     });
 
   } catch (err) {
-    return new Response(JSON.stringify({ error: 'Failed to process waitlist request' }), {
+    console.error('[Worker Error]:', err);
+    return new Response(JSON.stringify({ error: 'Failed to process waitlist request: ' + err.message }), {
       status: 500,
       headers: corsHeaders,
     });
@@ -162,33 +196,30 @@ function generateWelcomeEmailHtml(userEmail) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>You're on the Zoxia waitlist!</title>
 </head>
-<body style="margin:0;padding:0;background-color:#0B0D0F;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#F6F5F0;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#0B0D0F;padding:48px 20px;">
+<body style="margin:0;padding:0;background-color:#08090A;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#FAFAF7;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#08090A;padding:48px 20px;">
     <tr>
       <td align="center">
-        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background-color:#121417;border-radius:20px;padding:40px 32px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 50px rgba(0,0,0,0.5);">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background-color:#111317;border-radius:16px;padding:40px 32px;border:1px solid rgba(255,255,255,0.08);box-shadow:0 24px 60px rgba(0,0,0,0.6);">
           
           <!-- Logo & Brand Header -->
           <tr>
             <td align="left" style="padding-bottom:28px;">
-              <div style="font-size:24px;font-weight:900;letter-spacing:1.5px;color:#F6F5F0;">ZOXIA</div>
-              <div style="font-size:11px;font-weight:600;letter-spacing:1px;color:#9CA0A7;margin-top:2px;">by Cresco Ai LTD</div>
-            </td>
-          </tr>
-
-          <!-- Eyebrow Badge -->
-          <tr>
-            <td style="padding-bottom:12px;">
-              <div style="display:inline-block;font-size:11px;font-weight:700;letter-spacing:1px;color:#EB7600;background-color:rgba(235,118,0,0.12);padding:4px 12px;border-radius:9999px;border:1px solid rgba(235,118,0,0.25);">
-                EARLY ACCESS CONFIRMED
-              </div>
+              <table cellpadding="0" cellspacing="0">
+                <tr>
+                  <td>
+                    <div style="font-size:22px;font-weight:900;letter-spacing:1px;color:#FAFAF7;">ZOXIA</div>
+                    <div style="font-size:11px;font-weight:600;letter-spacing:0.8px;color:#9CA0A7;margin-top:2px;">by Cresco Ai LTD</div>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
 
           <!-- Heading -->
           <tr>
             <td style="padding-bottom:18px;">
-              <h1 style="font-size:26px;font-weight:800;letter-spacing:-0.5px;line-height:1.2;color:#F6F5F0;margin:0;">
+              <h1 style="font-size:26px;font-weight:800;letter-spacing:-0.5px;line-height:1.2;color:#FAFAF7;margin:0;">
                 You're on the list. 👀
               </h1>
             </td>
@@ -201,20 +232,20 @@ function generateWelcomeEmailHtml(userEmail) {
                 Thanks for requesting early access to <strong>Zoxia</strong>.
               </p>
               <p style="font-size:15px;line-height:1.6;color:#9CA0A7;margin:0 0 16px 0;">
-                We're currently building and testing Zoxia with an early cohort of creators, brands, and agencies to make content scheduling and performance intelligence seamless.
+                Zoxia is currently being built and tested with an early group of creators and businesses to make content scheduling and performance intelligence seamless.
               </p>
               <p style="font-size:15px;line-height:1.6;color:#9CA0A7;margin:0;">
-                Your spot is confirmed for <span style="color:#F6F5F0;font-weight:600;">${userEmail}</span>. We'll email you the moment your early-access invitation is ready.
+                We'll let you know when your early-access spot is ready for <span style="color:#FAFAF7;font-weight:600;">${userEmail}</span>.
               </p>
             </td>
           </tr>
 
-          <!-- Workflow Loop Snippet -->
+          <!-- Workflow Loop -->
           <tr>
-            <td style="padding:20px;background-color:rgba(0,0,0,0.3);border-radius:12px;border:1px solid rgba(255,255,255,0.06);margin-bottom:24px;">
-              <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:#EB7600;margin-bottom:6px;">THE ZOXIA WORKFLOW</div>
-              <div style="font-size:13px;font-weight:600;color:#F6F5F0;line-height:1.4;">
-                CREATE → SCHEDULE → PUBLISH → MEASURE → LEARN
+            <td style="padding:18px;background-color:rgba(0,0,0,0.4);border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
+              <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:#EB7600;margin-bottom:4px;">THE ZOXIA WORKFLOW</div>
+              <div style="font-size:12px;font-weight:700;color:#FAFAF7;letter-spacing:0.5px;">
+                CREATE → SCHEDULE → PUBLISH → MEASURE → LEARN → CREATE BETTER
               </div>
             </td>
           </tr>
@@ -224,7 +255,7 @@ function generateWelcomeEmailHtml(userEmail) {
             <td style="padding-top:32px;border-top:1px solid rgba(255,255,255,0.06);margin-top:28px;">
               <p style="font-size:12px;line-height:18px;color:#62666E;margin:0;text-align:center;">
                 Zoxia by Cresco Ai LTD · <a href="https://zoxia.site" style="color:#EB7600;text-decoration:none;">zoxia.site</a><br>
-                You're receiving this because you signed up for the Zoxia pre-launch waitlist.
+                You received this because you signed up for the Zoxia waitlist.
               </p>
             </td>
           </tr>

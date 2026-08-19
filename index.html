@@ -4,163 +4,175 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Zoxia — Content Scheduling & Performance Intelligence</title>
-  <meta name="description" content="Zoxia helps creators and businesses schedule content, manage their publishing queue, and understand what performs. Join the early-access waitlist.">
+  <meta name="description" content="Zoxia is a lightweight content automation and scheduling system built for creators and businesses. Stage your queue, publish on schedule, and see what performs.">
   <link rel="canonical" href="https://zoxia.site/">
   
-  <!-- Open Graph / Social Meta -->
+  <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://zoxia.site/">
   <meta property="og:title" content="Zoxia — Content Scheduling & Performance Intelligence">
-  <meta property="og:description" content="Zoxia helps creators and businesses schedule content, manage their publishing queue, and understand what performs. Join the early-access waitlist.">
+  <meta property="og:description" content="Zoxia is a lightweight content automation and scheduling system built for creators and businesses. Stage your queue, publish on schedule, and see what performs.">
   <meta property="og:image" content="https://zoxia.site/assets/logo-standalone.png">
 
-  <!-- Twitter Meta -->
+  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://zoxia.site/">
   <meta name="twitter:title" content="Zoxia — Content Scheduling & Performance Intelligence">
-  <meta name="twitter:description" content="Zoxia helps creators and businesses schedule content, manage their publishing queue, and understand what performs. Join the early-access waitlist.">
+  <meta name="twitter:description" content="Zoxia is a lightweight content automation and scheduling system built for creators and businesses. Stage your queue, publish on schedule, and see what performs.">
   <meta name="twitter:image" content="https://zoxia.site/assets/logo-standalone.png">
 
-  <!-- Favicon & Icons -->
-  <meta name="theme-color" content="#0B0D0F">
+  <!-- Favicon -->
+  <meta name="theme-color" content="#08090A">
   <link rel="icon" type="image/png" href="assets/logo-standalone.png">
   <link rel="apple-touch-icon" href="assets/logo-standalone.png">
 
-  <!-- Typography: Inter -->
+  <!-- Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-  <!-- Minimal Header -->
-  <header class="site-header">
-    <div class="container header-container">
+  <!-- Navigation -->
+  <header class="header">
+    <div class="container header-inner">
       <a href="/" class="brand" aria-label="Zoxia Home">
         <img src="assets/logo-standalone.png" alt="Zoxia Emblem" class="brand-emblem" width="28" height="28">
-        <span class="brand-title">ZOXIA</span>
+        <span class="brand-name">ZOXIA</span>
       </a>
-      
-      <a href="#waitlist" class="btn btn-header">Join the Waitlist</a>
+
+      <nav class="nav-links">
+        <a href="#problem" class="nav-link">The Problem</a>
+        <a href="#systems" class="nav-link">Core Systems</a>
+        <a href="#flywheel" class="nav-link">Workflow</a>
+      </nav>
+
+      <a href="#waitlist" class="btn btn-nav">Join Waitlist</a>
     </div>
   </header>
 
   <main>
     <!-- Hero Section -->
-    <section class="hero" id="waitlist">
-      <div class="container hero-layout">
+    <section class="hero-section" id="waitlist">
+      <div class="container hero-grid">
         
-        <div class="hero-text">
-          <div class="hero-origin">SOMETHING NEW FROM CRESCO</div>
+        <!-- Left: Copy & Form -->
+        <div class="hero-col-text">
+          <div class="kicker">SOMETHING NEW FROM CRESCO</div>
           
-          <h1 class="hero-title">
+          <h1 class="hero-heading">
             Create less chaos.<br>
             Get more from your content.
           </h1>
           
-          <p class="hero-desc">
+          <p class="hero-subheading">
             Zoxia helps you schedule your content, keep your publishing queue organized, and understand what actually performs — all in one simple workflow.
           </p>
 
-          <!-- Primary Waitlist Form -->
-          <div class="form-wrapper">
-            <form id="hero-form" class="signup-form" novalidate>
-              <div class="form-row">
+          <!-- Waitlist Form Container -->
+          <div class="waitlist-card">
+            <form id="hero-waitlist-form" class="waitlist-form" novalidate>
+              <div class="input-group">
                 <input 
                   type="email" 
                   id="hero-email" 
-                  class="email-input" 
-                  placeholder="Your email address" 
+                  class="waitlist-input" 
+                  placeholder="Enter your email address" 
                   required 
-                  aria-label="Email address"
                   autocomplete="email"
+                  aria-label="Email address"
                 >
-                <button type="submit" class="btn btn-submit">
+                <button type="submit" class="btn btn-primary">
                   <span class="btn-text">JOIN THE ZOXIA WAITLIST</span>
                   <span class="btn-spinner" aria-hidden="true"></span>
                 </button>
               </div>
-              <div id="hero-feedback" class="form-feedback" role="alert" aria-live="polite"></div>
+              <div id="hero-form-feedback" class="form-feedback" role="alert" aria-live="polite"></div>
             </form>
 
             <!-- Success State -->
-            <div id="hero-success" class="signup-success" style="display: none;">
-              <h2 class="success-heading">You're on the list. 👀</h2>
-              <p class="success-sub">
+            <div id="hero-success-state" class="waitlist-success" style="display: none;">
+              <h2 class="success-title">You're on the list. 👀</h2>
+              <p class="success-message">
                 Zoxia is currently being built and tested with an early group of creators and businesses. We'll let you know when your early-access spot is ready.
               </p>
               
-              <!-- Optional Non-Blocking Creator Type Selection -->
-              <div class="survey-section">
-                <p class="survey-title">What do you create?</p>
-                <div class="survey-options" role="group" aria-label="Creator category">
-                  <button type="button" class="survey-btn" data-role="Creator">Creator</button>
-                  <button type="button" class="survey-btn" data-role="Business">Business</button>
-                  <button type="button" class="survey-btn" data-role="Brand">Brand</button>
-                  <button type="button" class="survey-btn" data-role="Agency">Agency</button>
-                  <button type="button" class="survey-btn" data-role="Other">Other</button>
+              <div class="survey-box">
+                <p class="survey-prompt">What do you create?</p>
+                <div class="survey-tags" role="group" aria-label="Creator Category">
+                  <button type="button" class="tag-btn" data-role="Creator">Creator</button>
+                  <button type="button" class="tag-btn" data-role="Business">Business</button>
+                  <button type="button" class="tag-btn" data-role="Brand">Brand</button>
+                  <button type="button" class="tag-btn" data-role="Agency">Agency</button>
+                  <button type="button" class="tag-btn" data-role="Other">Other</button>
                 </div>
-                <div class="survey-confirmed" style="display: none;">Recorded. Thank you!</div>
+                <div class="survey-status" style="display: none;">Choice saved. Thank you!</div>
               </div>
             </div>
 
-            <p id="hero-note" class="form-note">Early access for creators and businesses.</p>
+            <div id="hero-footnote" class="form-footnote">Early access for creators and businesses.</div>
           </div>
         </div>
 
-        <!-- Realistic Product Interface Preview -->
-        <div class="hero-preview">
-          <div class="preview-window">
-            <div class="preview-topbar">
-              <div class="topbar-controls">
-                <span></span><span></span><span></span>
-              </div>
-              <div class="topbar-title">Queue · TikTok (@alexcreates)</div>
+        <!-- Right: Interactive Live Queue Simulator -->
+        <div class="hero-col-visual">
+          <div class="queue-device">
+            <div class="device-header">
+              <div class="device-dots"><span></span><span></span><span></span></div>
+              <div class="device-channel">TikTok · @alexcreates</div>
+              <div class="device-badge">AUTOPILOT ON</div>
             </div>
 
-            <div class="preview-body">
-              <div class="preview-summary">
-                <div class="summary-col">
-                  <span class="summary-label">Active Queue</span>
-                  <span class="summary-value">4 Scheduled</span>
+            <div class="device-body">
+              <div class="queue-meta-bar">
+                <div class="meta-item">
+                  <span class="meta-kicker">Queue Status</span>
+                  <span class="meta-value">4 Posts Staged</span>
                 </div>
-                <div class="summary-col">
-                  <span class="summary-label">Next Publication</span>
-                  <span class="summary-value">Today · 7:15 PM WAT</span>
+                <div class="meta-item">
+                  <span class="meta-kicker">Next Dispatch</span>
+                  <span class="meta-value">Today · 7:15 PM</span>
                 </div>
               </div>
 
-              <div class="preview-list">
-                <!-- Post Item 1 -->
-                <div class="post-item active-post">
-                  <div class="post-thumb thumb-a">0:45</div>
-                  <div class="post-details">
-                    <div class="post-title">Studio Lighting Setup & Vertical Video Gear Tour</div>
-                    <div class="post-meta">Today at 7:15 PM · Public · Duets on</div>
+              <div class="queue-items-list" id="interactive-queue">
+                <!-- Staged Item 1 -->
+                <div class="queue-entry selected" data-preview="1">
+                  <div class="entry-slot">19:15</div>
+                  <div class="entry-main">
+                    <div class="entry-title">Studio Lighting Setup & Vertical Video Gear Tour</div>
+                    <div class="entry-sub">Aspect: 9:16 · HD · Duets Allowed</div>
                   </div>
-                  <div class="post-state ready">Ready to Post</div>
+                  <div class="entry-status status-ready">Ready</div>
                 </div>
 
-                <!-- Post Item 2 -->
-                <div class="post-item">
-                  <div class="post-thumb thumb-b">1:12</div>
-                  <div class="post-details">
-                    <div class="post-title">3 Content Automations Every Solo Creator Needs</div>
-                    <div class="post-meta">Tomorrow at 12:30 PM · Public · Duets on</div>
+                <!-- Staged Item 2 -->
+                <div class="queue-entry" data-preview="2">
+                  <div class="entry-slot">12:30</div>
+                  <div class="entry-main">
+                    <div class="entry-title">3 Content Automations Every Solo Creator Needs</div>
+                    <div class="entry-sub">Tomorrow · Auto-Sound Match</div>
                   </div>
-                  <div class="post-state queued">Queued</div>
+                  <div class="entry-status status-queued">Queued</div>
                 </div>
 
-                <!-- Post Item 3 -->
-                <div class="post-item">
-                  <div class="post-thumb thumb-c">0:32</div>
-                  <div class="post-details">
-                    <div class="post-title">Desk Setup Tour & Workflow Ergonomics</div>
-                    <div class="post-meta">Yesterday · 142.8K Views · 64% Retention</div>
+                <!-- Staged Item 3 -->
+                <div class="queue-entry" data-preview="3">
+                  <div class="entry-slot">18:00</div>
+                  <div class="entry-main">
+                    <div class="entry-title">Desk Setup Tour & Workflow Ergonomics</div>
+                    <div class="entry-sub">Friday · 142.8K Views · 64% Retention</div>
                   </div>
-                  <div class="post-state published">Published</div>
+                  <div class="entry-status status-done">Published</div>
+                </div>
+              </div>
+
+              <div class="queue-footer-intel">
+                <div class="intel-icon">⚡</div>
+                <div class="intel-text">
+                  <strong>Posting Intelligence:</strong> Audience velocity peaks between 7:00 PM and 9:00 PM (WAT). Next slot optimized.
                 </div>
               </div>
             </div>
@@ -170,152 +182,197 @@
       </div>
     </section>
 
-    <!-- Problem Section -->
-    <section class="problem-section">
+    <!-- The Problem Section -->
+    <section class="section problem-section" id="problem">
       <div class="container">
-        <div class="problem-content">
-          <h2 class="problem-title">Creating content is only half the work.</h2>
-          
-          <div class="problem-steps">
-            <div class="step-item">
-              <div class="step-index">01</div>
-              <div class="step-label">Planning it.</div>
-            </div>
-            <div class="step-item">
-              <div class="step-index">02</div>
-              <div class="step-label">Scheduling it.</div>
-            </div>
-            <div class="step-item">
-              <div class="step-index">03</div>
-              <div class="step-label">Keeping track of it.</div>
-            </div>
-            <div class="step-item">
-              <div class="step-index">04</div>
-              <div class="step-label">Understanding what worked.</div>
-            </div>
+        <div class="section-header">
+          <h2 class="section-headline">Creating content is only half the work.</h2>
+        </div>
+
+        <div class="problem-grid">
+          <div class="problem-card">
+            <div class="card-num">01</div>
+            <h3 class="card-title">Planning it.</h3>
+            <p class="card-desc">Tracking upcoming content concepts, filming dates, and assets across fragmented apps.</p>
           </div>
 
-          <div class="problem-conclusion">
-            <p class="conclusion-lead">That repetitive work adds up.</p>
-            <p class="conclusion-text">Zoxia is being built to make the workflow simpler.</p>
+          <div class="problem-card">
+            <div class="card-num">02</div>
+            <h3 class="card-title">Scheduling it.</h3>
+            <p class="card-desc">Setting phone alarms to manually post at peak hours and interrupting your daily focus.</p>
+          </div>
+
+          <div class="problem-card">
+            <div class="card-num">03</div>
+            <h3 class="card-title">Keeping track of it.</h3>
+            <p class="card-desc">Wondering what was already published, what's pending in the queue, and what failed.</p>
+          </div>
+
+          <div class="problem-card">
+            <div class="card-num">04</div>
+            <h3 class="card-title">Understanding what worked.</h3>
+            <p class="card-desc">Guessing why one video hit 100k views while another stalled, with no clear creative feedback loop.</p>
+          </div>
+        </div>
+
+        <div class="problem-summary-row">
+          <div class="summary-statement">
+            <span class="statement-emphasis">That repetitive work adds up.</span>
+            <span class="statement-lead">Zoxia is being built to make the workflow simpler.</span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Benefits Section -->
-    <section class="benefits-section">
+    <!-- Core Systems Section -->
+    <section class="section systems-section" id="systems">
       <div class="container">
-        <div class="section-lead">
-          <h2 class="section-title">What Zoxia delivers</h2>
+        <div class="section-header">
+          <div class="section-sub">WHAT ZOXIA DELIVERS</div>
+          <h2 class="section-headline">Three core capabilities. Zero clutter.</h2>
         </div>
 
-        <div class="benefits-layout">
-          <div class="benefit-item">
-            <div class="benefit-count">01</div>
-            <h3 class="benefit-name">SCHEDULE WITHOUT THE HEADACHE</h3>
-            <p class="benefit-text">Queue your content and let Zoxia handle the publishing schedule.</p>
+        <div class="systems-grid">
+          <!-- System 1 -->
+          <div class="system-box">
+            <div class="system-tag">CAPABILITY 01</div>
+            <h3 class="system-title">SCHEDULE WITHOUT THE HEADACHE</h3>
+            <p class="system-desc">Queue your content and let Zoxia handle the publishing schedule.</p>
+            <ul class="system-specs">
+              <li>Multi-slot staged buffer</li>
+              <li>9:16 vertical framing verification</li>
+              <li>Automated token refresh & verification</li>
+            </ul>
           </div>
 
-          <div class="benefit-item">
-            <div class="benefit-count">02</div>
-            <h3 class="benefit-name">KNOW WHAT'S ACTUALLY WORKING</h3>
-            <p class="benefit-text">See how your posts perform and discover patterns in your own content.</p>
+          <!-- System 2 -->
+          <div class="system-box">
+            <div class="system-tag">CAPABILITY 02</div>
+            <h3 class="system-title">KNOW WHAT'S ACTUALLY WORKING</h3>
+            <p class="system-desc">See how your posts perform and discover patterns in your own content.</p>
+            <ul class="system-specs">
+              <li>Retention & watch-through telemetry</li>
+              <li>Format comparisons across reel lengths</li>
+              <li>First-party engagement signals</li>
+            </ul>
           </div>
 
-          <div class="benefit-item">
-            <div class="benefit-count">03</div>
-            <h3 class="benefit-name">BUILD A BETTER POSTING RHYTHM</h3>
-            <p class="benefit-text">Use your performance history to make smarter decisions about what to publish next.</p>
+          <!-- System 3 -->
+          <div class="system-box">
+            <div class="system-tag">CAPABILITY 03</div>
+            <h3 class="system-title">BUILD A BETTER POSTING RHYTHM</h3>
+            <p class="system-desc">Use your performance history to make smarter decisions about what to publish next.</p>
+            <ul class="system-specs">
+              <li>Audience peak activity slotting</li>
+              <li>Consistency tracking without burnout</li>
+              <li>Data-driven topic refinement</li>
+            </ul>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Product Showcase Section -->
-    <section class="showcase-section">
+    <!-- Interactive Showcase Section -->
+    <section class="section showcase-section">
       <div class="container">
-        <div class="section-lead">
-          <h2 class="section-title">Designed for clarity</h2>
+        <div class="section-header">
+          <div class="section-sub">PRODUCT PREVIEW</div>
+          <h2 class="section-headline">Designed for speed and clarity.</h2>
         </div>
 
-        <div class="showcase-tabs" role="tablist">
-          <button type="button" class="tab-trigger active" role="tab" aria-selected="true" data-target="queue">Content Queue</button>
-          <button type="button" class="tab-trigger" role="tab" aria-selected="false" data-target="scheduling">Scheduling</button>
-          <button type="button" class="tab-trigger" role="tab" aria-selected="false" data-target="insights">Performance Insights</button>
+        <div class="tabs-nav" role="tablist">
+          <button type="button" class="tab-button active" role="tab" aria-selected="true" data-tab="queue">Content Queue</button>
+          <button type="button" class="tab-button" role="tab" aria-selected="false" data-tab="scheduler">Smart Scheduling</button>
+          <button type="button" class="tab-button" role="tab" aria-selected="false" data-tab="insights">Performance Intelligence</button>
         </div>
 
-        <div class="showcase-cards">
-          <!-- Tab 1 -->
-          <div class="showcase-panel active" id="tab-queue">
-            <div class="showcase-grid">
-              <div class="showcase-info">
-                <h3 class="showcase-heading">Your upcoming lineup, clear at a glance.</h3>
-                <p class="showcase-body">Stage videos and photos in advance. Check 9:16 vertical compliance, captions, tags, and audience privacy before publishing.</p>
+        <div class="tab-content-wrapper">
+          <!-- Panel 1 -->
+          <div class="tab-panel active" id="tab-queue">
+            <div class="panel-layout">
+              <div class="panel-text">
+                <h3 class="panel-title">Your upcoming lineup, clear at a glance.</h3>
+                <p class="panel-body">Stage videos and photos in advance. Check 9:16 vertical compliance, captions, tags, and audience privacy before publishing.</p>
+                <div class="panel-pill-row">
+                  <span class="spec-label">9:16 Video</span>
+                  <span class="spec-label">Auto Verification</span>
+                  <span class="spec-label">Direct Upload</span>
+                </div>
               </div>
-              <div class="showcase-visual">
-                <div class="visual-card">
-                  <div class="visual-header">Queue Buffer (3 of 10 slots used)</div>
-                  <div class="visual-row">
-                    <div class="visual-thumb"></div>
-                    <div class="visual-meta">
-                      <div class="visual-title">Scaling Content Workflows in 2026</div>
-                      <div class="visual-sub">Today · 7:15 PM</div>
+              <div class="panel-preview">
+                <div class="preview-mini-card">
+                  <div class="mini-card-head">Active Queue Buffer (3 / 10 Slots)</div>
+                  <div class="mini-card-entry">
+                    <div class="mini-bullet"></div>
+                    <div class="mini-details">
+                      <div class="mini-name">Scaling Content Workflows in 2026</div>
+                      <div class="mini-time">Today at 7:15 PM WAT</div>
+                    </div>
+                    <span class="mini-tag">Ready</span>
+                  </div>
+                  <div class="mini-card-entry">
+                    <div class="mini-bullet"></div>
+                    <div class="mini-details">
+                      <div class="mini-name">Solo Creator Case Study (Part 2)</div>
+                      <div class="mini-time">Tomorrow at 12:30 PM WAT</div>
+                    </div>
+                    <span class="mini-tag">Queued</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel 2 -->
+          <div class="tab-panel" id="tab-scheduler">
+            <div class="panel-layout">
+              <div class="panel-text">
+                <h3 class="panel-title">Target the exact hour that matters.</h3>
+                <p class="panel-body">Select specific publication windows days in advance. Zoxia handles second-accurate queue execution with automated token refresh.</p>
+                <div class="panel-pill-row">
+                  <span class="spec-label">Timezone Sync</span>
+                  <span class="spec-label">BullMQ Precision</span>
+                  <span class="spec-label">Multi-Day Calendar</span>
+                </div>
+              </div>
+              <div class="panel-preview">
+                <div class="preview-mini-card">
+                  <div class="mini-card-head">Optimal Slot Allocation</div>
+                  <div class="time-grid">
+                    <div class="time-cell active">07:15 PM · Recommended</div>
+                    <div class="time-cell">08:00 PM · Active</div>
+                    <div class="time-cell">09:30 PM · Secondary</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel 3 -->
+          <div class="tab-panel" id="tab-insights">
+            <div class="panel-layout">
+              <div class="panel-text">
+                <h3 class="panel-title">Understand your posting performance.</h3>
+                <p class="panel-body">Track retention, watch-through, and engagement patterns across your own library to optimize your posting calendar.</p>
+                <div class="panel-pill-row">
+                  <span class="spec-label">Watch-Through %</span>
+                  <span class="spec-label">Hook Drop-Off</span>
+                  <span class="spec-label">Best Lengths</span>
+                </div>
+              </div>
+              <div class="panel-preview">
+                <div class="preview-mini-card">
+                  <div class="mini-card-head">Audience Telemetry</div>
+                  <div class="telemetry-grid">
+                    <div class="telem-item">
+                      <span class="telem-label">Avg. Completion</span>
+                      <span class="telem-val">64.2%</span>
+                    </div>
+                    <div class="telem-item">
+                      <span class="telem-label">Top Format</span>
+                      <span class="telem-val">30–45s Reels</span>
                     </div>
                   </div>
-                  <div class="visual-row">
-                    <div class="visual-thumb"></div>
-                    <div class="visual-meta">
-                      <div class="visual-title">Solo Creator Case Study</div>
-                      <div class="visual-sub">Tomorrow · 12:00 PM</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Tab 2 -->
-          <div class="showcase-panel" id="tab-scheduling">
-            <div class="showcase-grid">
-              <div class="showcase-info">
-                <h3 class="showcase-heading">Target the exact hour that matters.</h3>
-                <p class="showcase-body">Select specific publication windows days in advance. Zoxia ensures second-accurate queue execution with automated token refresh.</p>
-              </div>
-              <div class="showcase-visual">
-                <div class="visual-card">
-                  <div class="visual-header">Target Publication Time</div>
-                  <div class="time-selection">
-                    <div class="time-block active">07:15 PM</div>
-                    <div class="time-block">08:00 PM</div>
-                    <div class="time-block">09:30 PM</div>
-                  </div>
-                  <div class="time-note">Timezone: UTC+1 (WAT)</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Tab 3 -->
-          <div class="showcase-panel" id="tab-insights">
-            <div class="showcase-grid">
-              <div class="showcase-info">
-                <h3 class="showcase-heading">Understand your posting performance.</h3>
-                <p class="showcase-body">Track retention, watch-through, and engagement patterns across your own library to optimize your posting calendar.</p>
-              </div>
-              <div class="showcase-visual">
-                <div class="visual-card">
-                  <div class="visual-header">First-Party Post Metrics</div>
-                  <div class="metric-pair">
-                    <div class="metric-unit">
-                      <span class="m-label">Avg. Completion</span>
-                      <span class="m-value">64.2%</span>
-                    </div>
-                    <div class="metric-unit">
-                      <span class="m-label">Top Format</span>
-                      <span class="m-value">30–45s Reels</span>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -324,126 +381,127 @@
       </div>
     </section>
 
-    <!-- Workflow Section -->
-    <section class="workflow-section">
+    <!-- Workflow Flywheel Section -->
+    <section class="section flywheel-section" id="flywheel">
       <div class="container">
-        <div class="section-lead">
-          <h2 class="section-title">The Zoxia Workflow</h2>
+        <div class="section-header">
+          <div class="section-sub">THE CONTINUOUS LOOP</div>
+          <h2 class="section-headline">The Zoxia Workflow</h2>
         </div>
 
-        <div class="workflow-flow">
-          <div class="flow-step">
-            <span class="flow-num">01</span>
-            <span class="flow-name">CREATE</span>
+        <div class="flywheel-flow">
+          <div class="flywheel-step">
+            <span class="step-num">01</span>
+            <span class="step-label">CREATE</span>
           </div>
-          <div class="flow-divider" aria-hidden="true">→</div>
+          <div class="flow-arrow" aria-hidden="true">→</div>
 
-          <div class="flow-step">
-            <span class="flow-num">02</span>
-            <span class="flow-name">SCHEDULE</span>
+          <div class="flywheel-step">
+            <span class="step-num">02</span>
+            <span class="step-label">SCHEDULE</span>
           </div>
-          <div class="flow-divider" aria-hidden="true">→</div>
+          <div class="flow-arrow" aria-hidden="true">→</div>
 
-          <div class="flow-step">
-            <span class="flow-num">03</span>
-            <span class="flow-name">PUBLISH</span>
+          <div class="flywheel-step">
+            <span class="step-num">03</span>
+            <span class="step-label">PUBLISH</span>
           </div>
-          <div class="flow-divider" aria-hidden="true">→</div>
+          <div class="flow-arrow" aria-hidden="true">→</div>
 
-          <div class="flow-step">
-            <span class="flow-num">04</span>
-            <span class="flow-name">MEASURE</span>
+          <div class="flywheel-step">
+            <span class="step-num">04</span>
+            <span class="step-label">MEASURE</span>
           </div>
-          <div class="flow-divider" aria-hidden="true">→</div>
+          <div class="flow-arrow" aria-hidden="true">→</div>
 
-          <div class="flow-step">
-            <span class="flow-num">05</span>
-            <span class="flow-name">LEARN</span>
+          <div class="flywheel-step">
+            <span class="step-num">05</span>
+            <span class="step-label">LEARN</span>
           </div>
-          <div class="flow-divider" aria-hidden="true">→</div>
+          <div class="flow-arrow" aria-hidden="true">→</div>
 
-          <div class="flow-step final-step">
-            <span class="flow-num">06</span>
-            <span class="flow-name">CREATE BETTER</span>
+          <div class="flywheel-step step-highlight">
+            <span class="step-num">06</span>
+            <span class="step-label">CREATE BETTER</span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Bottom Early Access CTA -->
-    <section class="cta-section">
+    <!-- Bottom Early Access Section -->
+    <section class="section bottom-cta-section">
       <div class="container">
-        <div class="cta-container">
-          <h2 class="cta-title">Zoxia isn't public yet.</h2>
-          <p class="cta-sub">We're building it with our first group of users.</p>
+        <div class="bottom-cta-box">
+          <h2 class="bottom-cta-heading">Zoxia isn't public yet.</h2>
+          <p class="bottom-cta-sub">We're building it with our first group of users.</p>
 
-          <div class="form-wrapper center-wrapper">
-            <form id="bottom-form" class="signup-form" novalidate>
-              <div class="form-row">
+          <div class="bottom-form-wrap">
+            <form id="bottom-waitlist-form" class="waitlist-form" novalidate>
+              <div class="input-group">
                 <input 
                   type="email" 
                   id="bottom-email" 
-                  class="email-input" 
-                  placeholder="Your email address" 
+                  class="waitlist-input" 
+                  placeholder="Enter your email address" 
                   required 
-                  aria-label="Email address"
                   autocomplete="email"
+                  aria-label="Email address"
                 >
-                <button type="submit" class="btn btn-submit">
+                <button type="submit" class="btn btn-primary">
                   <span class="btn-text">JOIN ZOXIA</span>
                   <span class="btn-spinner" aria-hidden="true"></span>
                 </button>
               </div>
-              <div id="bottom-feedback" class="form-feedback" role="alert" aria-live="polite"></div>
+              <div id="bottom-form-feedback" class="form-feedback" role="alert" aria-live="polite"></div>
             </form>
 
-            <div id="bottom-success" class="signup-success" style="display: none;">
-              <h2 class="success-heading">You're on the list. 👀</h2>
-              <p class="success-sub">
+            <div id="bottom-success-state" class="waitlist-success" style="display: none;">
+              <h2 class="success-title">You're on the list. 👀</h2>
+              <p class="success-message">
                 Zoxia is currently being built and tested with an early group of creators and businesses. We'll let you know when your early-access spot is ready.
               </p>
             </div>
 
-            <p class="form-note">Early access for creators and businesses.</p>
+            <div class="form-footnote">Early access for creators and businesses.</div>
           </div>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- Clean Footer -->
-  <footer class="site-footer">
-    <div class="container footer-layout">
-      <div class="footer-left">
-        <div class="footer-brand">
-          <img src="assets/logo-standalone.png" alt="Zoxia Emblem" class="footer-emblem" width="20" height="20">
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand-col">
+        <div class="brand-row">
+          <img src="assets/logo-standalone.png" alt="Zoxia Emblem" class="footer-emblem" width="22" height="22">
           <span class="footer-name">ZOXIA</span>
         </div>
-        <div class="footer-corp">by Cresco Ai LTD</div>
+        <div class="footer-sub">by Cresco Ai LTD</div>
       </div>
 
-      <div class="footer-center">
-        <a href="#privacy" class="legal-link" data-modal="privacy">Privacy</a>
-        <a href="#terms" class="legal-link" data-modal="terms">Terms</a>
-        <a href="mailto:contact@cresco.ai" class="legal-link">Contact</a>
+      <div class="footer-links-col">
+        <a href="#privacy" class="footer-link" data-modal="privacy">Privacy Policy</a>
+        <a href="#terms" class="footer-link" data-modal="terms">Terms of Service</a>
+        <a href="mailto:contact@cresco.ai" class="footer-link">Contact</a>
       </div>
 
-      <div class="footer-right">
+      <div class="footer-copy-col">
         © 2026 Cresco Ai LTD. All rights reserved.
       </div>
     </div>
   </footer>
 
-  <!-- Modal Dialog -->
-  <div id="legal-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
-    <div class="modal-overlay" data-close></div>
-    <div class="modal-content">
-      <div class="modal-top">
-        <h3 id="modal-title" class="modal-heading">Privacy Policy</h3>
-        <button type="button" class="modal-close" data-close aria-label="Close dialog">✕</button>
+  <!-- Accessible Dialog Modal -->
+  <div id="info-modal" class="modal-dialog" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-card">
+      <div class="modal-header-row">
+        <h3 id="modal-heading" class="modal-title">Privacy Policy</h3>
+        <button type="button" class="modal-close-button" data-close-modal aria-label="Close dialog">✕</button>
       </div>
-      <div id="modal-text" class="modal-description">
-        <p>Zoxia is in private pre-launch. We only collect your email address for early-access notifications and product updates. We do not sell or share your information.</p>
+      <div id="modal-body-content" class="modal-body-content">
+        <p>Zoxia is in private pre-launch. We only collect your email address for early-access notifications and product updates. We do not sell or share your data.</p>
       </div>
     </div>
   </div>

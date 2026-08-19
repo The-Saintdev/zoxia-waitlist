@@ -1,5 +1,5 @@
 /**
- * ZOXIA Waitlist — Client Application
+ * ZOXIA Waitlist — Client Application & Interactive Engine
  * Domain: https://zoxia.site
  * Parent Company: Cresco Ai LTD
  */
@@ -8,19 +8,19 @@
   'use strict';
 
   const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const STORAGE_KEY = 'zoxia_waitlist_email';
-  const ROLE_STORAGE_KEY = 'zoxia_waitlist_role';
+  const STORAGE_KEY = 'zoxia_waitlist_registered_email';
+  const ROLE_STORAGE_KEY = 'zoxia_waitlist_registered_role';
 
   /* ==========================================================================
-     1. Form Controller
+     1. Form Controller & Real-Time Validation
      ========================================================================== */
-  function initForm(formId, inputId, feedbackId, successId, noteId, source) {
+  function initWaitlistForm(formId, inputId, feedbackId, successId, footnoteId, source) {
     const form = document.getElementById(formId);
     const input = document.getElementById(inputId);
     const feedback = document.getElementById(feedbackId);
     const successBox = document.getElementById(successId);
-    const note = noteId ? document.getElementById(noteId) : null;
-    const submitBtn = form?.querySelector('.btn-submit');
+    const footnote = footnoteId ? document.getElementById(footnoteId) : null;
+    const submitBtn = form?.querySelector('.btn-primary');
 
     if (!form || !input || !submitBtn) return;
 
@@ -33,27 +33,28 @@
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = input.value.trim();
+      const rawEmail = input.value.trim();
 
-      if (!email) {
+      if (!rawEmail) {
         showError('Please enter your email address.');
         input.focus();
         return;
       }
 
-      if (!EMAIL_REGEX.test(email)) {
+      if (!EMAIL_REGEX.test(rawEmail)) {
         showError('Please enter a valid email address.');
         input.focus();
         return;
       }
 
       // Check if already registered
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved && saved.toLowerCase() === email.toLowerCase()) {
-        showSuccess();
+      const cached = localStorage.getItem(STORAGE_KEY);
+      if (cached && cached.toLowerCase() === rawEmail.toLowerCase()) {
+        showSuccessView();
         return;
       }
 
+      // Set Loading State
       submitBtn.classList.add('loading');
       submitBtn.disabled = true;
       input.disabled = true;
@@ -62,25 +63,35 @@
       try {
         const response = await fetch('/api/waitlist', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
           body: JSON.stringify({
-            email: email.toLowerCase(),
+            email: rawEmail.toLowerCase(),
             source: source,
             submittedAt: new Date().toISOString(),
           }),
         });
 
-        if (response.ok) {
-          localStorage.setItem(STORAGE_KEY, email);
-          showSuccess();
+        const data = await response.json().catch(() => ({}));
+
+        if (response.ok && data.success) {
+          console.log('[Zoxia Waitlist] Submission success:', data);
+          if (data.mailjetDebug) {
+            console.log('[Zoxia Email Status]:', data.mailjetDebug);
+          }
+          localStorage.setItem(STORAGE_KEY, rawEmail);
+          showSuccessView();
         } else {
-          const data = await response.json().catch(() => ({}));
-          throw new Error(data.error || 'Unable to submit. Please try again.');
+          console.error('[Zoxia Waitlist Error]:', data);
+          showError(data.error || 'Submission failed. Please try again.');
         }
       } catch (err) {
-        // Local fallback if edge function is offline
-        localStorage.setItem(STORAGE_KEY, email);
-        showSuccess();
+        console.warn('[Zoxia Waitlist] Network fallback:', err.message);
+        // Persist locally if network was blocked
+        localStorage.setItem(STORAGE_KEY, rawEmail);
+        showSuccessView();
       } finally {
         submitBtn.classList.remove('loading');
         submitBtn.disabled = false;
@@ -95,29 +106,29 @@
       }
     }
 
-    function showSuccess() {
+    function showSuccessView() {
       form.style.display = 'none';
-      if (note) note.style.display = 'none';
+      if (footnote) footnote.style.display = 'none';
       if (successBox) successBox.style.display = 'block';
-      initSurvey();
+      initSurveyListeners();
     }
   }
 
   /* ==========================================================================
      2. Optional Secondary Survey
      ========================================================================== */
-  function initSurvey() {
-    const btns = document.querySelectorAll('.survey-btn');
-    const confirmed = document.querySelector('.survey-confirmed');
+  function initSurveyListeners() {
+    const tagButtons = document.querySelectorAll('.tag-btn');
+    const statusText = document.querySelector('.survey-status');
 
-    btns.forEach((btn) => {
+    tagButtons.forEach((btn) => {
       btn.addEventListener('click', async () => {
         const role = btn.getAttribute('data-role');
-        btns.forEach((b) => b.classList.remove('selected'));
+        tagButtons.forEach((b) => b.classList.remove('selected'));
         btn.classList.add('selected');
 
         localStorage.setItem(ROLE_STORAGE_KEY, role);
-        if (confirmed) confirmed.style.display = 'block';
+        if (statusText) statusText.style.display = 'block';
 
         const userEmail = localStorage.getItem(STORAGE_KEY);
         if (userEmail) {
@@ -132,59 +143,75 @@
   }
 
   /* ==========================================================================
-     3. Showcase Tabs
+     3. Interactive Hero Queue Simulator
      ========================================================================== */
-  function initTabs() {
-    const tabs = document.querySelectorAll('.tab-trigger');
-    const panels = document.querySelectorAll('.showcase-panel');
-
-    tabs.forEach((tab) => {
-      tab.addEventListener('click', () => {
-        const target = tab.getAttribute('data-target');
-
-        tabs.forEach((t) => {
-          t.classList.remove('active');
-          t.setAttribute('aria-selected', 'false');
-        });
-        tab.classList.add('active');
-        tab.setAttribute('aria-selected', 'true');
-
-        panels.forEach((p) => p.classList.remove('active'));
-        const activePanel = document.getElementById(`tab-${target}`);
-        if (activePanel) activePanel.classList.add('active');
+  function initQueueSimulator() {
+    const queueEntries = document.querySelectorAll('.queue-entry');
+    queueEntries.forEach((entry) => {
+      entry.addEventListener('click', () => {
+        queueEntries.forEach((e) => e.classList.remove('selected'));
+        entry.classList.add('selected');
       });
     });
   }
 
   /* ==========================================================================
-     4. Legal Modals
+     4. Showcase Tabs Switcher
      ========================================================================== */
-  function initModals() {
-    const modal = document.getElementById('legal-modal');
-    const title = document.getElementById('modal-title');
-    const text = document.getElementById('modal-text');
-    const triggers = document.querySelectorAll('[data-modal]');
-    const closeBtns = document.querySelectorAll('[data-close]');
+  function initShowcaseTabs() {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const panels = document.querySelectorAll('.tab-panel');
+
+    tabButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const targetId = button.getAttribute('data-tab');
+
+        tabButtons.forEach((btn) => {
+          btn.classList.remove('active');
+          btn.setAttribute('aria-selected', 'false');
+        });
+        button.classList.add('active');
+        button.setAttribute('aria-selected', 'true');
+
+        panels.forEach((p) => p.classList.remove('active'));
+        const targetPanel = document.getElementById(`tab-${targetId}`);
+        if (targetPanel) {
+          targetPanel.classList.add('active');
+        }
+      });
+    });
+  }
+
+  /* ==========================================================================
+     5. Accessible Modals (Privacy & Terms)
+     ========================================================================== */
+  function initLegalModals() {
+    const modal = document.getElementById('info-modal');
+    const modalTitle = document.getElementById('modal-heading');
+    const modalBody = document.getElementById('modal-body-content');
+    const openTriggers = document.querySelectorAll('[data-modal]');
+    const closeTriggers = document.querySelectorAll('[data-close-modal]');
 
     if (!modal) return;
 
-    triggers.forEach((trigger) => {
+    openTriggers.forEach((trigger) => {
       trigger.addEventListener('click', (e) => {
         e.preventDefault();
         const type = trigger.getAttribute('data-modal');
 
         if (type === 'privacy') {
-          title.textContent = 'Privacy Policy';
-          text.innerHTML = `
+          modalTitle.textContent = 'Privacy Policy';
+          modalBody.innerHTML = `
             <p style="margin-bottom:12px;"><strong>Zoxia by Cresco Ai LTD</strong></p>
-            <p style="margin-bottom:12px;">We only collect your email address for early-access notifications and product updates. We do not sell or distribute your data.</p>
-            <p>You can request removal from our waitlist at any time by emailing contact@cresco.ai.</p>
+            <p style="margin-bottom:12px;">We collect your email address solely to notify you when your early-access invitation is ready and provide platform updates.</p>
+            <p>We do not sell, rent, or distribute your email address to third parties. You can request deletion of your entry at any time by emailing contact@cresco.ai.</p>
           `;
         } else if (type === 'terms') {
-          title.textContent = 'Terms of Service';
-          text.innerHTML = `
+          modalTitle.textContent = 'Terms of Service';
+          modalBody.innerHTML = `
             <p style="margin-bottom:12px;"><strong>Zoxia Early Access Terms</strong></p>
-            <p>Zoxia is in active pre-launch testing. Early access is granted on a rolling cohort basis.</p>
+            <p style="margin-bottom:12px;">By joining the waitlist, you acknowledge that Zoxia is in active pre-launch development by Cresco Ai LTD.</p>
+            <p>Early access is granted on a rolling cohort basis.</p>
           `;
         }
 
@@ -193,34 +220,58 @@
       });
     });
 
-    closeBtns.forEach((btn) => {
-      btn.addEventListener('click', () => {
+    closeTriggers.forEach((closeBtn) => {
+      closeBtn.addEventListener('click', () => {
         modal.classList.remove('open');
         modal.setAttribute('aria-hidden', 'true');
       });
     });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('open')) {
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+    });
   }
 
   /* ==========================================================================
-     5. Initialization
+     6. DOM Ready Initialization
      ========================================================================== */
   document.addEventListener('DOMContentLoaded', () => {
-    initForm('hero-form', 'hero-email', 'hero-feedback', 'hero-success', 'hero-note', 'hero');
-    initForm('bottom-form', 'bottom-email', 'bottom-feedback', 'bottom-success', null, 'bottom');
-    initTabs();
-    initModals();
+    initWaitlistForm(
+      'hero-waitlist-form',
+      'hero-email',
+      'hero-form-feedback',
+      'hero-success-state',
+      'hero-footnote',
+      'hero'
+    );
 
-    // Check existing email
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const heroForm = document.getElementById('hero-form');
-      const heroSuccess = document.getElementById('hero-success');
-      const heroNote = document.getElementById('hero-note');
+    initWaitlistForm(
+      'bottom-waitlist-form',
+      'bottom-email',
+      'bottom-form-feedback',
+      'bottom-success-state',
+      null,
+      'bottom'
+    );
+
+    initQueueSimulator();
+    initShowcaseTabs();
+    initLegalModals();
+
+    // Check if user was already registered
+    const existing = localStorage.getItem(STORAGE_KEY);
+    if (existing) {
+      const heroForm = document.getElementById('hero-waitlist-form');
+      const heroSuccess = document.getElementById('hero-success-state');
+      const heroFootnote = document.getElementById('hero-footnote');
       if (heroForm && heroSuccess) {
         heroForm.style.display = 'none';
-        if (heroNote) heroNote.style.display = 'none';
+        if (heroFootnote) heroFootnote.style.display = 'none';
         heroSuccess.style.display = 'block';
-        initSurvey();
+        initSurveyListeners();
       }
     }
   });
