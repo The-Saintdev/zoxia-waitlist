@@ -1,6 +1,6 @@
 /**
  * ZOXIA Waitlist — Edge Serverless Submission & Automated Email Dispatcher
- * Runs on Cloudflare Pages Functions (zero server maintenance, 100% free tier)
+ * Integrates with Mailjet Send API v3.1
  * Endpoint: POST /api/waitlist
  */
 
@@ -47,65 +47,49 @@ export async function onRequestPost(context) {
       await env.WAITLIST_KV.put(`waitlist:${email}`, JSON.stringify(record));
     }
 
-    // 3. Send Automated Branded Confirmation Email to Subscriber via SendGrid / Resend
+    // 3. Send Automated Branded Confirmation Email via Mailjet API v3.1
     let emailSent = false;
 
-    // A. Using SendGrid
-    if (env && env.SENDGRID_API_KEY) {
-      const fromEmail = env.SMTP_FROM || 'noreply@zoxia.site';
-      const fromName = 'Zoxia';
-      
-      const welcomeEmailHtml = generateWelcomeEmailHtml(email);
+    const mailjetApiKey = env?.MAILJET_API_KEY;
+    const mailjetSecretKey = env?.MAILJET_SECRET_KEY;
+    const fromEmail = env?.SMTP_FROM || env?.MAILJET_FROM || 'noreply@zoxia.site';
+    const fromName = 'Zoxia';
 
-      const sendGridRes = await fetch('https://api.sendgrid.com/v3/mail/send', {
+    if (mailjetApiKey && mailjetSecretKey) {
+      const welcomeEmailHtml = generateWelcomeEmailHtml(email);
+      const authHeader = 'Basic ' + btoa(`${mailjetApiKey}:${mailjetSecretKey}`);
+
+      const mailjetRes = await fetch('https://api.mailjet.com/v3.1/send', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${env.SENDGRID_API_KEY}`,
+          'Authorization': authHeader,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          personalizations: [{ to: [{ email }] }],
-          from: { email: fromEmail, name: fromName },
-          subject: "You're on the Zoxia waitlist! 👀",
-          content: [
+          Messages: [
             {
-              type: 'text/html',
-              value: welcomeEmailHtml,
-            },
-            {
-              type: 'text/plain',
-              value: `You're on the Zoxia waitlist!\n\nThanks for signing up for early access to Zoxia.\n\nWe're currently building and testing Zoxia with an early cohort of creators and businesses.\n\nWe'll email you the moment your early-access spot is ready.\n\n— The Zoxia Team\nZoxia by Cresco Ai LTD · https://zoxia.site`,
+              From: {
+                Email: fromEmail,
+                Name: fromName,
+              },
+              To: [
+                {
+                  Email: email,
+                }
+              ],
+              Subject: "You're on the Zoxia waitlist! 👀",
+              TextPart: `You're on the Zoxia waitlist!\n\nThanks for signing up for early access to Zoxia.\n\nWe're currently building and testing Zoxia with an early cohort of creators and businesses.\n\nWe'll email you the moment your early-access spot is ready.\n\n— The Zoxia Team\nZoxia by Cresco Ai LTD · https://zoxia.site`,
+              HTMLPart: welcomeEmailHtml,
             }
-          ],
+          ]
         }),
       });
 
-      if (sendGridRes.status >= 200 && sendGridRes.status < 300) {
+      if (mailjetRes.ok) {
         emailSent = true;
-      }
-    }
-
-    // B. Alternative: Using Resend (if RESEND_API_KEY is provided instead)
-    if (!emailSent && env && env.RESEND_API_KEY) {
-      const fromEmail = env.SMTP_FROM || 'noreply@zoxia.site';
-      const welcomeEmailHtml = generateWelcomeEmailHtml(email);
-
-      const resendRes = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${env.RESEND_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: `Zoxia <${fromEmail}>`,
-          to: [email],
-          subject: "You're on the Zoxia waitlist! 👀",
-          html: welcomeEmailHtml,
-        }),
-      });
-
-      if (resendRes.ok) {
-        emailSent = true;
+      } else {
+        const errorText = await mailjetRes.text();
+        console.error('[Mailjet API Error]:', mailjetRes.status, errorText);
       }
     }
 
