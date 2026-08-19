@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 240" fill="none" width="100%" height="100%">
+  <defs>
+    <linearGradient id="zEmblemGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF851A" />
+      <stop offset="100%" stop-color="#EB7600" />
+    </linearGradient>
+  </defs>
+
+  <!-- Transparent Background Logo Mark -->
+  <g transform="translate(20, 20) scale(0.38)">
+    <path d="M 96 112 L 416 112 L 416 176 L 240 176 L 368 336 L 416 336 L 416 400 L 96 400 L 96 336 L 272 336 L 144 176 L 96 176 Z" 
+          fill="url(#zEmblemGrad)" 
+          stroke="rgba(255, 255, 255, 0.2)" 
+          stroke-width="6"
+          stroke-linejoin="round" />
+    <polygon points="270,176 330,176 242,336 182,336" fill="#FFFFFF" opacity="0.9" />
+  </g>
+
+  <!-- Clean Bold Wordmark -->
+  <text x="210" y="132" font-family="'Inter', sans-serif" font-size="78" font-weight="900" letter-spacing="4" fill="#F6F5F0">ZOXIA</text>
+  
+  <!-- Subtle Subtitle -->
+  <text x="214" y="172" font-family="'Inter', sans-serif" font-size="20" font-weight="600" letter-spacing="1.5" fill="#9CA0A7">by Cresco Ai LTD</text>
+</svg>

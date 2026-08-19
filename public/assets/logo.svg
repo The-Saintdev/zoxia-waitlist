@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" width="100%" height="100%">
+  <defs>
+    <linearGradient id="zoxiaGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF851A" />
+      <stop offset="50%" stop-color="#EB7600" />
+      <stop offset="100%" stop-color="#D96500" />
+    </linearGradient>
+    <filter id="zoxiaGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#EB7600" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Geometric Dynamic 'Z' Emblem with Transparent Background -->
+  <g filter="url(#zoxiaGlow)">
+    <!-- Top Horizontal Bar with Chamfer -->
+    <path d="M 96 112 L 416 112 L 416 176 L 240 176 L 368 336 L 416 336 L 416 400 L 96 400 L 96 336 L 272 336 L 144 176 L 96 176 Z" 
+          fill="url(#zoxiaGradient)" 
+          stroke="rgba(255, 255, 255, 0.18)" 
+          stroke-width="4"
+          stroke-linejoin="round" />
+    
+    <!-- Dynamic Forward Accent Slash -->
+    <polygon points="270,176 330,176 242,336 182,336" fill="#FFFFFF" opacity="0.9" />
+  </g>
+</svg>
