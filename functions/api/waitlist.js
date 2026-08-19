@@ -1,6 +1,6 @@
 /**
  * ZOXIA Waitlist — Cloudflare Pages Functions Handler
- * Integrates with Mailjet Send API v3.1 with detailed diagnostics
+ * Integrates with Mailjet Send API v3.1
  */
 
 export async function onRequestPost(context) {
@@ -48,9 +48,9 @@ export async function onRequestPost(context) {
     let emailSent = false;
     let mailjetDebug = null;
 
-    const mailjetApiKey = env?.MAILJET_API_KEY;
-    const mailjetSecretKey = env?.MAILJET_SECRET_KEY;
-    const fromEmail = env?.SMTP_FROM || env?.MAILJET_FROM || 'noreply@zoxia.site';
+    const mailjetApiKey = env?.MAILJET_API_KEY || env?.MAILJET_PUBLIC_KEY || env?.MAILJET_KEY || env?.MJ_APIKEY_PUBLIC || env?.API_KEY;
+    const mailjetSecretKey = env?.MAILJET_SECRET_KEY || env?.MAILJET_PRIVATE_KEY || env?.MAILJET_SECRET || env?.MJ_APIKEY_PRIVATE || env?.SECRET_KEY;
+    const fromEmail = env?.SMTP_FROM || env?.MAILJET_FROM || env?.MAILJET_SENDER || env?.SENDER_EMAIL || 'noreply@zoxia.site';
     const fromName = 'Zoxia';
 
     if (mailjetApiKey && mailjetSecretKey) {
