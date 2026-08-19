@@ -1,6 +1,7 @@
 /**
- * ZOXIA Cloudflare Worker — Universal Email Dispatcher (Resend + Mailjet)
- * Supports Resend (recommended, 3000 free/mo) and Mailjet
+ * ZOXIA Cloudflare Worker — Production Edge Handler
+ * Handles /api/waitlist and serves public static assets
+ * Default Sender: noreply@zoxia.site
  */
 
 export default {
@@ -8,35 +9,7 @@ export default {
     const url = new URL(request.url);
     const emailConfig = getEmailConfig(env);
 
-    // 1. Live Diagnostic Test Endpoint: GET /api/test-email?to=user@gmail.com
-    if (url.pathname === '/api/test-email') {
-      const recipient = url.searchParams.get('to') || 'test@example.com';
-      const testResult = await executeEmailSend(emailConfig, recipient);
-      return new Response(JSON.stringify(testResult, null, 2), {
-        status: testResult.ok ? 200 : 400,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-      });
-    }
-
-    // 2. Health Check: GET /api/health
-    if (url.pathname === '/api/health') {
-      const availableKeys = env ? Object.keys(env) : [];
-      return new Response(JSON.stringify({
-        status: 'online',
-        provider: emailConfig.provider,
-        hasResendKey: !!emailConfig.resendApiKey,
-        hasMailjetKey: !!emailConfig.mailjetApiKey,
-        hasMailjetSecret: !!emailConfig.mailjetSecretKey,
-        fromEmail: emailConfig.fromEmail,
-        detectedKeys: availableKeys,
-        timestamp: new Date().toISOString(),
-      }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-      });
-    }
-
-    // 3. Waitlist Submission: POST /api/waitlist
+    // Waitlist Form Submission: POST /api/waitlist
     if (url.pathname === '/api/waitlist') {
       if (request.method === 'OPTIONS') {
         return new Response(null, {
@@ -59,7 +32,7 @@ export default {
       });
     }
 
-    // 4. Serve Static Assets
+    // Serve Static Assets
     if (env.ASSETS) {
       return env.ASSETS.fetch(request);
     }
@@ -83,7 +56,8 @@ function getEmailConfig(env) {
     mailjetSecretKey = parts[1].trim();
   }
 
-  const fromEmail = env?.SMTP_FROM || env?.RESEND_FROM || env?.MAILJET_FROM || 'onboarding@resend.dev';
+  // Default production sender is noreply@zoxia.site
+  const fromEmail = env?.SMTP_FROM || env?.RESEND_FROM || env?.MAILJET_FROM || 'noreply@zoxia.site';
   const provider = resendApiKey ? 'Resend' : (mailjetApiKey && mailjetSecretKey ? 'Mailjet' : 'None');
 
   return {
@@ -96,15 +70,18 @@ function getEmailConfig(env) {
 }
 
 /**
- * Universal email dispatcher (supports Resend & Mailjet)
+ * Universal email dispatcher (Resend + Mailjet)
  */
 async function executeEmailSend(config, recipientEmail) {
   const welcomeEmailHtml = generateWelcomeEmailHtml(recipientEmail);
 
-  // A. Dispatch via Resend (Modern, instant 3,000 free/mo)
+  // 1. Dispatch via Resend with noreply@zoxia.site
   if (config.resendApiKey) {
     try {
-      const fromAddress = config.fromEmail.includes('@') ? `Zoxia <${config.fromEmail}>` : 'Zoxia <onboarding@resend.dev>';
+      const fromAddress = config.fromEmail.includes('<')
+        ? config.fromEmail
+        : `Zoxia <${config.fromEmail}>`;
+
       const res = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -120,20 +97,13 @@ async function executeEmailSend(config, recipientEmail) {
       });
 
       const data = await res.json().catch(() => ({}));
-      return {
-        ok: res.ok,
-        provider: 'Resend',
-        httpStatus: res.status,
-        fromEmailUsed: fromAddress,
-        recipientUsed: recipientEmail,
-        rawResponse: data,
-      };
+      return { ok: res.ok, provider: 'Resend', rawResponse: data };
     } catch (err) {
       return { ok: false, provider: 'Resend', error: err.message };
     }
   }
 
-  // B. Dispatch via Mailjet API v3.1
+  // 2. Dispatch via Mailjet (Fallback)
   if (config.mailjetApiKey && config.mailjetSecretKey) {
     try {
       const authHeader = 'Basic ' + btoa(`${config.mailjetApiKey.trim()}:${config.mailjetSecretKey.trim()}`);
@@ -161,10 +131,6 @@ async function executeEmailSend(config, recipientEmail) {
       return {
         ok: res.ok && msgStatus === 'success',
         provider: 'Mailjet',
-        httpStatus: res.status,
-        messageStatus: msgStatus || 'unknown',
-        fromEmailUsed: config.fromEmail,
-        recipientUsed: recipientEmail,
         rawResponse: data,
       };
     } catch (err) {
@@ -172,11 +138,7 @@ async function executeEmailSend(config, recipientEmail) {
     }
   }
 
-  return {
-    ok: false,
-    error: 'No valid email provider credentials configured in Cloudflare (add RESEND_API_KEY or unblock Mailjet)',
-    config,
-  };
+  return { ok: false, error: 'No email credentials provided' };
 }
 
 /**
@@ -214,13 +176,12 @@ async function handleWaitlistSubmission(request, env, config) {
       } catch (e) {}
     }
 
-    // Execute Email Send
+    // Send confirmation email
     const sendResult = await executeEmailSend(config, email);
 
     return new Response(JSON.stringify({
       success: true,
       emailSent: sendResult.ok,
-      result: sendResult,
       message: "You're on the list. 👀",
     }), {
       status: 200,
@@ -236,7 +197,7 @@ async function handleWaitlistSubmission(request, env, config) {
 }
 
 /**
- * Zoxia Welcome Email HTML Template
+ * Zoxia Welcome Email Template
  */
 function generateWelcomeEmailHtml(userEmail) {
   return `
