@@ -1,7 +1,6 @@
 /**
- * ZOXIA Cloudflare Worker — Production Edge Handler
- * Handles /api/waitlist and serves public static assets
- * Default Sender: noreply@zoxia.site
+ * ZOXIA Cloudflare Worker — Production Edge Handler + Signees Logger
+ * Handles /api/waitlist, /api/signees (export), and serves public static assets
  */
 
 export default {
@@ -9,7 +8,23 @@ export default {
     const url = new URL(request.url);
     const emailConfig = getEmailConfig(env);
 
-    // Waitlist Form Submission: POST /api/waitlist
+    // 1. Export / View Signees List (Admin): GET /api/signees?secret=...
+    if (url.pathname === '/api/signees') {
+      const adminSecret = env?.ADMIN_SECRET || env?.ADMIN_KEY || 'zoxia2026';
+      const providedSecret = url.searchParams.get('secret') || request.headers.get('x-admin-secret');
+
+      if (providedSecret !== adminSecret) {
+        return new Response(JSON.stringify({ error: 'Unauthorized. Please provide valid ?secret= parameter.' }), {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+
+      const format = url.searchParams.get('format') || 'json';
+      return handleListSignees(env, format);
+    }
+
+    // 2. Waitlist Form Submission: POST /api/waitlist
     if (url.pathname === '/api/waitlist') {
       if (request.method === 'OPTIONS') {
         return new Response(null, {
@@ -32,7 +47,7 @@ export default {
       });
     }
 
-    // Serve Static Assets
+    // 3. Serve Static Assets
     if (env.ASSETS) {
       return env.ASSETS.fetch(request);
     }
@@ -42,10 +57,11 @@ export default {
 };
 
 /**
- * Detects whether Resend or Mailjet credentials are present
+ * Extracts configuration from environment
  */
 function getEmailConfig(env) {
   const resendApiKey = env?.RESEND_API_KEY || env?.RESEND_KEY || '';
+  const resendAudienceId = env?.RESEND_AUDIENCE_ID || '';
   
   let mailjetApiKey = env?.MAILJET_API_KEY || env?.MAILJET_PUBLIC_KEY || env?.API_KEY || '';
   let mailjetSecretKey = env?.MAILJET_SECRET_KEY || env?.MAILJET_PRIVATE_KEY || env?.SECRET_KEY || '';
@@ -56,13 +72,13 @@ function getEmailConfig(env) {
     mailjetSecretKey = parts[1].trim();
   }
 
-  // Default production sender is noreply@zoxia.site
   const fromEmail = env?.SMTP_FROM || env?.RESEND_FROM || env?.MAILJET_FROM || 'noreply@zoxia.site';
   const provider = resendApiKey ? 'Resend' : (mailjetApiKey && mailjetSecretKey ? 'Mailjet' : 'None');
 
   return {
     provider,
     resendApiKey,
+    resendAudienceId,
     mailjetApiKey,
     mailjetSecretKey,
     fromEmail,
@@ -70,12 +86,117 @@ function getEmailConfig(env) {
 }
 
 /**
+ * Handles waitlist form submission, logs signee, and dispatches welcome email
+ */
+async function handleWaitlistSubmission(request, env, config) {
+  const corsHeaders = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+  };
+
+  try {
+    const body = await request.json();
+    const name = body.name ? body.name.trim() : '';
+    const email = body.email ? body.email.trim().toLowerCase() : '';
+    const role = body.role || 'Unspecified';
+    const source = body.source || 'hero';
+    const submittedAt = body.submittedAt || new Date().toISOString();
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      return new Response(JSON.stringify({ error: 'Please enter a valid email address.' }), {
+        status: 400,
+        headers: corsHeaders,
+      });
+    }
+
+    const clientIp = request.headers.get('CF-Connecting-IP') || '';
+    const country = request.headers.get('CF-IPCountry') || '';
+
+    const signeeRecord = {
+      name: name || 'Creator',
+      email,
+      role,
+      source,
+      submittedAt,
+      ip: clientIp,
+      country,
+    };
+
+    // 1. Log to Cloudflare KV Database (if WAITLIST_KV is bound)
+    if (env && env.WAITLIST_KV) {
+      try {
+        await env.WAITLIST_KV.put(`signee:${email}`, JSON.stringify(signeeRecord));
+
+        // Maintain Master Index of all signee emails
+        let indexList = [];
+        const existingIndex = await env.WAITLIST_KV.get('__signees_index__');
+        if (existingIndex) {
+          try { indexList = JSON.parse(existingIndex); } catch (e) {}
+        }
+        if (!indexList.includes(email)) {
+          indexList.unshift(email);
+          await env.WAITLIST_KV.put('__signees_index__', JSON.stringify(indexList));
+        }
+      } catch (kvErr) {
+        console.error('[KV Logging Error]:', kvErr);
+      }
+    }
+
+    // 2. Sync to Resend Contacts / Audience (if RESEND_API_KEY & AUDIENCE_ID configured)
+    if (config.resendApiKey && config.resendAudienceId) {
+      fetch(`https://api.resend.com/audiences/${config.resendAudienceId}/contacts`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${config.resendApiKey.trim()}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          first_name: name || undefined,
+          unsubscribed: false,
+        }),
+      }).catch((e) => console.warn('[Resend Audience Sync]:', e.message));
+    }
+
+    // 3. Optional Admin Webhook Alert (Discord / Slack / Telegram)
+    if (env && env.WAITLIST_WEBHOOK_URL) {
+      fetch(env.WAITLIST_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: `🎉 **New Zoxia Signee!**\n**Name**: ${name || 'N/A'}\n**Email**: \`${email}\`\n**Role**: ${role}\n**Country**: ${country || 'N/A'}\n**Time**: ${new Date().toLocaleString()}`,
+        }),
+      }).catch(() => {});
+    }
+
+    // 4. Send Confirmation Welcome Email
+    const sendResult = await executeEmailSend(config, email, name);
+
+    return new Response(JSON.stringify({
+      success: true,
+      emailSent: sendResult.ok,
+      message: "You're on the list. 👀",
+    }), {
+      status: 200,
+      headers: corsHeaders,
+    });
+
+  } catch (err) {
+    return new Response(JSON.stringify({ error: 'Failed to process waitlist request: ' + err.message }), {
+      status: 500,
+      headers: corsHeaders,
+    });
+  }
+}
+
+/**
  * Universal email dispatcher (Resend + Mailjet)
  */
-async function executeEmailSend(config, recipientEmail) {
-  const welcomeEmailHtml = generateWelcomeEmailHtml(recipientEmail);
+async function executeEmailSend(config, recipientEmail, recipientName) {
+  const welcomeEmailHtml = generateWelcomeEmailHtml(recipientEmail, recipientName);
 
-  // 1. Dispatch via Resend with noreply@zoxia.site
+  // A. Dispatch via Resend
   if (config.resendApiKey) {
     try {
       const fromAddress = config.fromEmail.includes('<')
@@ -103,7 +224,7 @@ async function executeEmailSend(config, recipientEmail) {
     }
   }
 
-  // 2. Dispatch via Mailjet (Fallback)
+  // B. Dispatch via Mailjet (Fallback)
   if (config.mailjetApiKey && config.mailjetSecretKey) {
     try {
       const authHeader = 'Basic ' + btoa(`${config.mailjetApiKey.trim()}:${config.mailjetSecretKey.trim()}`);
@@ -117,9 +238,9 @@ async function executeEmailSend(config, recipientEmail) {
           Messages: [
             {
               From: { Email: config.fromEmail, Name: 'Zoxia' },
-              To: [{ Email: recipientEmail }],
+              To: [{ Email: recipientEmail, Name: recipientName || undefined }],
               Subject: "You're on the Zoxia waitlist! 👀",
-              TextPart: `You're on the Zoxia waitlist!\n\nThanks for signing up for early access to Zoxia.\n\nWe'll email you the moment your early-access spot is ready.\n\n— The Zoxia Team\nZoxia by Cresco Ai LTD · https://zoxia.site`,
+              TextPart: `Hi ${recipientName || 'there'},\n\nYou're on the Zoxia waitlist!\n\nThanks for signing up for early access.\n\n— The Zoxia Team\nZoxia by Cresco Ai LTD · https://zoxia.site`,
               HTMLPart: welcomeEmailHtml,
             }
           ]
@@ -138,68 +259,72 @@ async function executeEmailSend(config, recipientEmail) {
     }
   }
 
-  return { ok: false, error: 'No email credentials provided' };
+  return { ok: false, error: 'No email credentials configured' };
 }
 
 /**
- * Handles waitlist form submission
+ * Admin Signees List & CSV Export handler
  */
-async function handleWaitlistSubmission(request, env, config) {
-  const corsHeaders = {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-  };
+async function handleListSignees(env, format) {
+  if (!env || !env.WAITLIST_KV) {
+    return new Response(JSON.stringify({
+      message: 'Cloudflare KV (WAITLIST_KV) is not bound. Bind WAITLIST_KV in Cloudflare Dashboard to enable database storage.',
+      signees: [],
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 
   try {
-    const body = await request.json();
-    const email = body.email ? body.email.trim().toLowerCase() : '';
-    const role = body.role || 'Unspecified';
-    const source = body.source || 'hero';
-    const submittedAt = body.submittedAt || new Date().toISOString();
+    const rawIndex = await env.WAITLIST_KV.get('__signees_index__');
+    const emailList = rawIndex ? JSON.parse(rawIndex) : [];
+    const signees = [];
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email || !emailRegex.test(email)) {
-      return new Response(JSON.stringify({ error: 'Please enter a valid email address.' }), {
-        status: 400,
-        headers: corsHeaders,
+    for (const email of emailList) {
+      const record = await env.WAITLIST_KV.get(`signee:${email}`);
+      if (record) {
+        try { signees.push(JSON.parse(record)); } catch (e) {}
+      }
+    }
+
+    // CSV format
+    if (format === 'csv') {
+      const csvRows = ['Name,Email,Role,Source,Country,SubmittedAt'];
+      signees.forEach((s) => {
+        csvRows.push(`"${s.name || ''}","${s.email}","${s.role || ''}","${s.source || ''}","${s.country || ''}","${s.submittedAt || ''}"`);
+      });
+      return new Response(csvRows.join('\n'), {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/csv',
+          'Content-Disposition': 'attachment; filename="zoxia-waitlist-signees.csv"',
+        },
       });
     }
 
-    // Persist to KV if present
-    if (env && env.WAITLIST_KV) {
-      try {
-        const clientIp = request.headers.get('CF-Connecting-IP') || '';
-        const country = request.headers.get('CF-IPCountry') || '';
-        await env.WAITLIST_KV.put(`waitlist:${email}`, JSON.stringify({
-          email, role, source, submittedAt, ip: clientIp, country,
-        }));
-      } catch (e) {}
-    }
-
-    // Send confirmation email
-    const sendResult = await executeEmailSend(config, email);
-
+    // JSON format
     return new Response(JSON.stringify({
-      success: true,
-      emailSent: sendResult.ok,
-      message: "You're on the list. 👀",
-    }), {
+      total: signees.length,
+      signees,
+    }, null, 2), {
       status: 200,
-      headers: corsHeaders,
+      headers: { 'Content-Type': 'application/json' },
     });
-
   } catch (err) {
-    return new Response(JSON.stringify({ error: 'Failed to process waitlist request: ' + err.message }), {
+    return new Response(JSON.stringify({ error: 'Failed to retrieve signees: ' + err.message }), {
       status: 500,
-      headers: corsHeaders,
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 }
 
 /**
- * Zoxia Welcome Email Template
+ * Zoxia Welcome Email HTML Template with Personalized Greeting
  */
-function generateWelcomeEmailHtml(userEmail) {
+function generateWelcomeEmailHtml(userEmail, userName) {
+  const greetingName = userName ? `, ${userName}` : '';
+
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -235,7 +360,7 @@ function generateWelcomeEmailHtml(userEmail) {
           <tr>
             <td style="padding-bottom:24px;">
               <p style="font-size:15px;line-height:1.6;color:#9CA0A7;margin:0 0 16px 0;">
-                Thanks for requesting early access to <strong>Zoxia</strong>.
+                Hi${greetingName}, thanks for requesting early access to <strong>Zoxia</strong>.
               </p>
               <p style="font-size:15px;line-height:1.6;color:#9CA0A7;margin:0 0 16px 0;">
                 Zoxia is currently being built and tested with an early group of creators and businesses to make content scheduling and performance intelligence seamless.

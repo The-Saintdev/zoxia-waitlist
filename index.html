@@ -228,7 +228,7 @@
     }
 
     @media (min-width: 640px) {
-      .btn-primary { width: auto; padding: 0 24px; }
+      .btn-primary { width: auto; padding: 0 20px; }
     }
 
     .btn-primary:hover { background-color: var(--accent-hover); }
@@ -295,7 +295,7 @@
     /* Waitlist Form */
     .form-container {
       width: 100%;
-      max-width: 480px;
+      max-width: 540px;
     }
 
     .form-input-row {
@@ -306,8 +306,10 @@
 
     @media (min-width: 640px) {
       .form-input-row {
-        flex-direction: row;
-        gap: var(--space-2);
+        display: grid;
+        grid-template-columns: 1fr 1.2fr auto;
+        gap: 8px;
+        align-items: center;
       }
     }
 
@@ -318,15 +320,15 @@
       background-color: var(--surface);
       border: 1px solid var(--border-medium);
       border-radius: var(--radius-xs);
-      padding: 0 var(--space-4);
+      padding: 0 14px;
       font-family: var(--font-sans);
-      font-size: 16px; /* 16px prevents iOS Safari auto-zoom on focus */
+      font-size: 16px; /* 16px prevents iOS Safari auto-zoom */
       color: var(--text-pure);
       outline: none;
       transition: all var(--transition);
     }
 
-    .text-input::placeholder { color: var(--text-subtle); }
+    .text-input::placeholder { color: var(--text-subtle); font-size: 14px; }
     .text-input:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 2px var(--accent-soft);
@@ -975,7 +977,7 @@
     }
 
     .bottom-form-container {
-      max-width: 480px;
+      max-width: 540px;
       margin: 0 auto;
     }
 
@@ -1105,16 +1107,25 @@
             <form id="hero-form" class="waitlist-form" novalidate>
               <div class="form-input-row">
                 <input 
+                  type="text" 
+                  id="hero-name" 
+                  class="text-input" 
+                  placeholder="Your name" 
+                  required 
+                  autocomplete="name"
+                  aria-label="Your name"
+                >
+                <input 
                   type="email" 
                   id="hero-email" 
                   class="text-input" 
-                  placeholder="Enter your email address" 
+                  placeholder="Your email address" 
                   required 
                   autocomplete="email"
                   aria-label="Email address"
                 >
                 <button type="submit" class="btn btn-primary">
-                  <span class="btn-text">JOIN THE ZOXIA WAITLIST</span>
+                  <span class="btn-text">JOIN WAITLIST</span>
                   <span class="btn-spinner" aria-hidden="true"></span>
                 </button>
               </div>
@@ -1459,10 +1470,19 @@
             <form id="bottom-form" class="waitlist-form" novalidate>
               <div class="form-input-row">
                 <input 
+                  type="text" 
+                  id="bottom-name" 
+                  class="text-input" 
+                  placeholder="Your name" 
+                  required 
+                  autocomplete="name"
+                  aria-label="Your name"
+                >
+                <input 
                   type="email" 
                   id="bottom-email" 
                   class="text-input" 
-                  placeholder="Enter your email address" 
+                  placeholder="Your email address" 
                   required 
                   autocomplete="email"
                   aria-label="Email address"
