@@ -42,7 +42,7 @@ Open `http://localhost:8080` in your browser.
 
 ## ☁️ How it deploys
 
-zoxia.site is a **Cloudflare Worker** named `zoxia-waitlist` (not a Pages project), connected to this repository through Workers Builds. A push to `main` builds and deploys it.
+zoxia.site is a **Cloudflare Worker** named `zoxia-waitlist` (not a Pages project). **Pushing to GitHub does not deploy it.** Every deployment on record was made with wrangler; none came from a git trigger.
 
 - `worker.js` handles every `/api/*` route. Everything else is served from `public/`.
 - `public/` is output. Edit the files at the root and run `npm run build` to copy them in, then commit both.
