@@ -123,7 +123,7 @@
      2. Optional Secondary Survey
      ========================================================================== */
   function setupSurvey() {
-    const tagButtons = document.querySelectorAll('.tag-btn');
+    const tagButtons = document.querySelectorAll('.role-btn');
     const statusText = document.querySelector('.survey-status');
 
     tagButtons.forEach((btn) => {

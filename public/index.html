@@ -3,64 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>Zoxia — Content Scheduling & Performance Intelligence</title>
+  <title>Zoxia, Content Scheduling & Performance Intelligence</title>
   <meta name="description" content="Zoxia is a lightweight content automation and scheduling system built for creators and businesses. Stage your queue, publish on schedule, and see what performs.">
   <link rel="canonical" href="https://zoxia.site/">
   
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://zoxia.site/">
-  <meta property="og:title" content="Zoxia — Content Scheduling & Performance Intelligence">
+  <meta property="og:title" content="Zoxia, Content Scheduling & Performance Intelligence">
   <meta property="og:description" content="Zoxia is a lightweight content automation and scheduling system built for creators and businesses. Stage your queue, publish on schedule, and see what performs.">
   <meta property="og:image" content="https://zoxia.site/assets/logo-standalone.png">
 
   <!-- Twitter Meta -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://zoxia.site/">
-  <meta name="twitter:title" content="Zoxia — Content Scheduling & Performance Intelligence">
+  <meta name="twitter:title" content="Zoxia, Content Scheduling & Performance Intelligence">
   <meta name="twitter:description" content="Zoxia is a lightweight content automation and scheduling system built for creators and businesses. Stage your queue, publish on schedule, and see what performs.">
   <meta name="twitter:image" content="https://zoxia.site/assets/logo-standalone.png">
 
   <!-- Favicons -->
-  <meta name="theme-color" content="#090A0D">
+  <meta name="theme-color" content="#0b0812">
   <link rel="icon" type="image/png" href="assets/logo-standalone.png">
   <link rel="apple-touch-icon" href="assets/logo-standalone.png">
 
   <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
   <style>
     /* ==========================================================================
-       ZOXIA — Obsidian Mobile-First Responsive Design System
+       ZOXIA, Obsidian Mobile-First Responsive Design System
        ========================================================================== */
     :root {
-      --accent: #EB7600;
-      --accent-hover: #FF851A;
-      --accent-soft: rgba(235, 118, 0, 0.12);
-      --accent-border: rgba(235, 118, 0, 0.35);
+      --accent: #c77fc4;
+      --accent-hover: #dda0da;
+      --accent-soft: rgba(199, 127, 196, 0.12);
+      --accent-border: rgba(199, 127, 196, 0.38);
 
-      --canvas: #090A0D;
-      --surface: #12141A;
-      --surface-raised: #181B22;
-      --surface-active: #20242D;
+      --canvas: #0b0812;
+      --surface: #15101c;
+      --surface-raised: #1c1626;
+      --surface-active: #241d30;
 
-      --text-pure: #FAFAF7;
-      --text-primary: #EDECE6;
-      --text-muted: #9CA0A7;
-      --text-subtle: #62666E;
+      --text-pure: #f2eef7;
+      --text-primary: #e4dcea;
+      --text-muted: #b0a7bc;
+      --text-subtle: #8c8399;
 
       --border-hairline: rgba(255, 255, 255, 0.08);
       --border-medium: rgba(255, 255, 255, 0.16);
 
-      --status-ready-bg: rgba(235, 118, 0, 0.14);
-      --status-ready-text: #EB7600;
+      --status-ready-bg: rgba(199, 127, 196, 0.14);
+      --status-ready-text: #c77fc4;
       --status-queued-bg: rgba(255, 255, 255, 0.06);
-      --status-queued-text: #9CA0A7;
-      --status-done-bg: rgba(53, 201, 138, 0.14);
-      --status-done-text: #35C98A;
-      --error: #FF5C5C;
+      --status-queued-text: #b0a7bc;
+      --status-done-bg: rgba(91, 231, 212, 0.14);
+      --status-done-text: #5be7d4;
+      --error: #f06a6a;
 
       --space-1: 4px;
       --space-2: 8px;
@@ -76,8 +73,8 @@
       --radius-sm: 10px;
       --radius-md: 14px;
 
-      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       --transition: 160ms cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -389,30 +386,166 @@
       gap: 6px;
     }
 
-    .tag-btn {
-      background-color: var(--surface-raised);
-      border: 1px solid var(--border-hairline);
-      color: var(--text-muted);
-      font-family: var(--font-sans);
-      font-size: 12px;
-      font-weight: 500;
-      padding: 6px 12px;
-      border-radius: var(--radius-xs);
-      cursor: pointer;
-      transition: all var(--transition);
-    }
-
-    .tag-btn:hover, .tag-btn.selected {
-      background-color: var(--accent);
-      border-color: var(--accent);
-      color: #FFFFFF;
-    }
-
     .survey-status {
       margin-top: var(--space-2);
       font-size: 12px;
       color: var(--status-done-text);
       font-weight: 600;
+    }
+
+    /* The two research questions, and the founding member offer. Both live
+       after the email is secured, so neither adds friction to the signup. */
+    .deep-survey,
+    .founding {
+      border-top: 1px solid var(--border-hairline);
+      padding-top: var(--space-3);
+      margin-top: var(--space-3);
+    }
+
+    .deep-label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin: var(--space-2) 0 6px;
+      line-height: 1.5;
+    }
+
+    .deep-input {
+      width: 100%;
+      background-color: var(--surface-raised);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-xs);
+      color: var(--text-pure);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      line-height: 1.6;
+      padding: 8px 10px;
+      resize: vertical;
+    }
+
+    .deep-input:focus-visible {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .deep-submit {
+      margin-top: var(--space-2);
+    }
+
+    .founding-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-pure);
+      margin-bottom: 6px;
+    }
+
+    .founding-text {
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--text-muted);
+      margin-bottom: var(--space-2);
+    }
+
+
+    /* ---------------------------------------------------- the hero claim --
+       Replaces the fake product dashboard. Two sides, one divider, and the
+       difference between them is the whole product. */
+    .claim {
+      margin: 0;
+      background: var(--surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      padding: var(--space-6);
+      display: grid;
+      gap: var(--space-5);
+    }
+
+    .claim-side { display: grid; gap: 6px; }
+
+    .claim-who {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-subtle);
+    }
+
+    .claim-said {
+      font-size: clamp(20px, 3.2vw, 26px);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      color: var(--text-muted);
+    }
+
+    /* The one place the teal earns its keep: it marks the confirmed state,
+       which is the only claim on this page that competitors cannot make. */
+    .claim-us .claim-said { color: var(--status-done-text); }
+
+    .claim-real {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-muted);
+      max-width: 34ch;
+    }
+
+    .claim-divider {
+      height: 1px;
+      background: linear-gradient(90deg, var(--border-medium), transparent);
+    }
+
+    .claim-foot {
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--text-subtle);
+      border-top: 1px solid var(--border-hairline);
+      padding-top: var(--space-4);
+    }
+
+    /* ------------------------------------------------------ role choices --
+       Was a row of pills. Zoxia does not ship pills anywhere, in any product:
+       it is a standing company rule and this page was the last violation. */
+    .role-options {
+      display: grid;
+      /* Five options, five cells. auto-fit at 96px orphaned 'Other' onto a
+         row of its own, which reads as a layout bug rather than a choice. */
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1px;
+      background: var(--border-hairline);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-xs);
+      overflow: hidden;
+    }
+
+    .role-btn {
+      background: var(--surface);
+      border: 0;
+      color: var(--text-muted);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 10px 8px;
+      cursor: pointer;
+      transition: background-color var(--transition), color var(--transition);
+    }
+
+    .role-btn:hover { background: var(--surface-raised); color: var(--text-pure); }
+
+    .role-btn.selected {
+      background: var(--accent-soft);
+      color: var(--text-pure);
+      box-shadow: inset 0 -2px 0 var(--accent);
+    }
+
+    @media (max-width: 420px) {
+      /* Three across, and the fifth stretches to close the row. Five items
+         in a three-column grid otherwise leaves a hole in the corner. */
+      .role-options { grid-template-columns: repeat(3, 1fr); }
+      .role-btn:last-child { grid-column: span 2; }
+    }
+
+    .role-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
     }
 
     .btn-spinner {
@@ -457,7 +590,7 @@
       letter-spacing: 0.8px;
       padding: 2px 6px;
       border-radius: var(--radius-xs);
-      background-color: rgba(53, 201, 138, 0.14);
+      background-color: rgba(91, 231, 212, 0.14);
       color: var(--status-done-text);
     }
 
@@ -737,7 +870,7 @@
       gap: var(--space-2);
     }
 
-    .cap-specs li::before { content: "—"; color: var(--accent); }
+    .cap-specs li::before { content: ", "; color: var(--accent); }
 
     /* Showcase Tabs */
     .showcase-tabs {
@@ -1093,13 +1226,21 @@
         <div class="hero-left">
           <div class="hero-label">SOMETHING NEW FROM CRESCO</div>
           
+          <!--
+            The headline is the claim, not a mood.
+
+            It was "Create less chaos. Get more from your content.", which ran
+            to three lines, said nothing a competitor could not say, and made
+            no promise anyone could check. This one is checkable, which is the
+            whole point of the product.
+          -->
           <h1 class="hero-headline">
-            Create less chaos.<br>
-            Get more from your content.
+            Your posts<br>
+            actually go out.
           </h1>
-          
+
           <p class="hero-summary">
-            Zoxia helps you schedule your content, keep your publishing queue organized, and understand what actually performs — all in one simple workflow.
+            And if one does not, you will know why before your client does.
           </p>
 
           <!-- Form Area -->
@@ -1141,14 +1282,58 @@
               
               <div class="creator-survey">
                 <p class="survey-question">What do you create?</p>
-                <div class="survey-buttons" role="group" aria-label="Creator Category">
-                  <button type="button" class="tag-btn" data-role="Creator">Creator</button>
-                  <button type="button" class="tag-btn" data-role="Business">Business</button>
-                  <button type="button" class="tag-btn" data-role="Brand">Brand</button>
-                  <button type="button" class="tag-btn" data-role="Agency">Agency</button>
-                  <button type="button" class="tag-btn" data-role="Other">Other</button>
+                <div class="role-options" role="group" aria-label="Creator Category">
+                  <button type="button" class="role-btn" data-role="Creator">Creator</button>
+                  <button type="button" class="role-btn" data-role="Business">Business</button>
+                  <button type="button" class="role-btn" data-role="Brand">Brand</button>
+                  <button type="button" class="role-btn" data-role="Agency">Agency</button>
+                  <button type="button" class="role-btn" data-role="Other">Other</button>
                 </div>
                 <div class="survey-status" style="display: none;">Selection saved. Thank you!</div>
+              </div>
+
+              <!--
+                The two questions the waitlist exists to answer, and the card.
+
+                After the email rather than before it, so neither adds friction
+                to the thing we cannot recover. Free text rather than options,
+                because the wording creators use is half of what we are trying
+                to learn.
+              -->
+              <div class="deep-survey">
+                <p class="survey-question">Two questions, if you have a minute</p>
+
+                <label class="deep-label" for="q-lost">
+                  Have you ever had a scheduled post fail without knowing?
+                </label>
+                <textarea id="q-lost" class="deep-input" rows="2"
+                          placeholder="What happened, and how did you find out?"></textarea>
+
+                <label class="deep-label" for="q-proof">
+                  What do you send a brand when they ask for your numbers?
+                </label>
+                <textarea id="q-proof" class="deep-input" rows="2"
+                          placeholder="Screenshots, a media kit, or something else?"></textarea>
+
+                <button type="button" id="answers-btn" class="btn btn-primary deep-submit">
+                  <span class="btn-text">SEND ANSWERS</span>
+                  <span class="btn-spinner" aria-hidden="true"></span>
+                </button>
+                <div id="answers-feedback" class="form-feedback" role="alert" aria-live="polite"></div>
+              </div>
+
+              <div class="founding">
+                <p class="founding-title">Want your spot held?</p>
+                <p class="founding-text">
+                  Founding members pay <strong>&#8358;100 now</strong>, which becomes &#8358;100 of
+                  credit when we launch. It checks the card works and holds your place. Nothing
+                  else is charged, and we will email you before anything is.
+                </p>
+                <button type="button" id="founding-btn" class="btn btn-secondary">
+                  <span class="btn-text">BECOME A FOUNDING MEMBER</span>
+                  <span class="btn-spinner" aria-hidden="true"></span>
+                </button>
+                <div id="founding-feedback" class="form-feedback" role="alert" aria-live="polite"></div>
               </div>
             </div>
 
@@ -1156,62 +1341,39 @@
           </div>
         </div>
 
-        <!-- Right: Interactive Product Simulator -->
+        <!-- Right: the claim, stated plainly -->
         <div class="hero-right">
-          <div class="preview-deck">
-            <div class="deck-top">
-              <div class="deck-dots"><span></span><span></span><span></span></div>
-              <div class="deck-channel">TikTok · @alexcreates</div>
-              <div class="deck-state">AUTOPILOT ON</div>
+          <!--
+            A diagram of the claim, not a mock of the product.
+
+            What was here was a fake dashboard built out of divs: invented
+            queue rows, invented video titles, an "AUTOPILOT ON" badge and
+            fabricated engagement numbers. A picture of software that does not
+            exist yet is the oldest tell there is, and it sat directly above a
+            promise about honesty.
+
+            This says the same thing the product does, and every word of it is
+            true today.
+          -->
+          <figure class="claim">
+            <div class="claim-side claim-them">
+              <p class="claim-who">Most schedulers</p>
+              <p class="claim-said">Published</p>
+              <p class="claim-real">Handed to the platform. Nobody checked.</p>
             </div>
 
-            <div class="deck-content">
-              <div class="deck-stats">
-                <div class="stat-cell">
-                  <span class="stat-kicker">Queue Status</span>
-                  <span class="stat-number">4 Posts Staged</span>
-                </div>
-                <div class="stat-cell">
-                  <span class="stat-kicker">Next Dispatch</span>
-                  <span class="stat-number">Today · 7:15 PM</span>
-                </div>
-              </div>
+            <div class="claim-divider" aria-hidden="true"></div>
 
-              <div class="deck-rows">
-                <div class="preview-row active" data-index="1">
-                  <div class="row-time">19:15</div>
-                  <div class="row-info">
-                    <div class="row-title">Studio Lighting Setup & Vertical Gear Tour</div>
-                    <div class="row-tags">9:16 Vertical · HD · Duets Allowed</div>
-                  </div>
-                  <div class="row-badge badge-ready">Ready</div>
-                </div>
-
-                <div class="preview-row" data-index="2">
-                  <div class="row-time">12:30</div>
-                  <div class="row-info">
-                    <div class="row-title">3 Content Automations Every Solo Creator Needs</div>
-                    <div class="row-tags">Tomorrow · Auto-Sound Match</div>
-                  </div>
-                  <div class="row-badge badge-queued">Queued</div>
-                </div>
-
-                <div class="preview-row" data-index="3">
-                  <div class="row-time">18:00</div>
-                  <div class="row-info">
-                    <div class="row-title">Desk Setup Tour & Workflow Ergonomics</div>
-                    <div class="row-tags">Friday · 142.8K Views · 64% Retention</div>
-                  </div>
-                  <div class="row-badge badge-done">Published</div>
-                </div>
-              </div>
-
-              <div class="deck-footer">
-                <span class="footer-icon">⚡</span>
-                <span class="footer-note"><strong>Audience Velocity:</strong> Best posting window identified between 7:00 PM – 9:00 PM (WAT).</span>
-              </div>
+            <div class="claim-side claim-us">
+              <p class="claim-who">Zoxia</p>
+              <p class="claim-said">Published, confirmed by TikTok</p>
+              <p class="claim-real">We asked. It answered. That is the difference.</p>
             </div>
-          </div>
+
+            <figcaption class="claim-foot">
+              When a platform refuses a post after accepting it, you hear it from us.
+            </figcaption>
+          </figure>
         </div>
 
       </div>
@@ -1262,7 +1424,6 @@
     <section class="content-section" id="capabilities">
       <div class="container">
         <div class="section-intro">
-          <div class="section-kicker">WHAT ZOXIA DELIVERS</div>
           <h2 class="section-heading">Three core capabilities. Zero clutter.</h2>
         </div>
 
@@ -1307,7 +1468,6 @@
     <section class="content-section">
       <div class="container">
         <div class="section-intro">
-          <div class="section-kicker">PRODUCT PREVIEW</div>
           <h2 class="section-heading">Designed for speed and clarity.</h2>
         </div>
 
@@ -1401,7 +1561,7 @@
                     </div>
                     <div class="stat-unit">
                       <span class="u-label">Top Format</span>
-                      <span class="u-val">30–45s Reels</span>
+                      <span class="u-val">30-45s Reels</span>
                     </div>
                   </div>
                 </div>
@@ -1416,7 +1576,6 @@
     <section class="content-section" id="workflow">
       <div class="container">
         <div class="section-intro">
-          <div class="section-kicker">THE CONTINUOUS FLYWHEEL</div>
           <h2 class="section-heading">The Zoxia Workflow</h2>
         </div>
 
