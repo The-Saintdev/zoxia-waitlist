@@ -10,10 +10,12 @@ export default {
 
     // 1. Export / View Signees List (Admin): GET /api/signees?secret=...
     if (url.pathname === '/api/signees') {
-      const adminSecret = env?.ADMIN_SECRET || env?.ADMIN_KEY || 'zoxia2026';
+      // No fallback. This repository is public, so any default written here
+      // is a password everyone has. Without the secret set, the export is shut.
+      const adminSecret = env?.ADMIN_SECRET || env?.ADMIN_KEY || '';
       const providedSecret = url.searchParams.get('secret') || request.headers.get('x-admin-secret');
 
-      if (providedSecret !== adminSecret) {
+      if (!adminSecret || providedSecret !== adminSecret) {
         return new Response(JSON.stringify({ error: 'Unauthorized. Please provide valid ?secret= parameter.' }), {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
