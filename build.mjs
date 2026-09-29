@@ -10,11 +10,10 @@
  * A build step is the fix. The root is the only place anyone edits, `public/`
  * is output, and output is never edited.
  *
- * `public/` stays committed on purpose. Cloudflare Pages is currently
- * configured with no build command, so it serves whatever is in the
- * repository; gitignoring the output would deploy an empty site. Once the
- * dashboard has `npm run build` set as the build command, `public/` can be
- * added to .gitignore and this stops being a thing anyone thinks about.
+ * `public/` stays committed on purpose. Workers Builds deploys whatever is in
+ * the repository unless the dashboard sets a build command, so gitignoring
+ * the output would deploy an empty site. Once the dashboard has
+ * `npm run build` as the build command, `public/` can be gitignored.
  */
 import { cp, mkdir, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';

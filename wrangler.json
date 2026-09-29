@@ -6,5 +6,9 @@
   "assets": {
     "directory": "./public",
     "binding": "ASSETS"
-  }
+  },
+  "kv_namespaces": [
+    { "binding": "WAITLIST_KV", "id": "b3d7724ca5a94e9885ada5a95b361d38" }
+  ],
+  "keep_vars": true
 }
