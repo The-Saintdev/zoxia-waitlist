@@ -1,0 +1,40 @@
+# Deploy the waitlist on every push to main.
+#
+# The site stopped updating because nothing deployed it. wrangler.json
+# declares a Worker with static assets, and a Worker does not deploy itself
+# when you push: it needs `wrangler deploy` to run somewhere. Nothing ran it,
+# so zoxia.site kept serving whatever was last pushed by hand.
+#
+# ONE-TIME SETUP: add a repository secret named CLOUDFLARE_API_TOKEN, from
+# Cloudflare dashboard, My Profile, API Tokens, using the "Edit Cloudflare
+# Workers" template. Add CLOUDFLARE_ACCOUNT_ID too if the account has more
+# than one. Until that secret exists this workflow will fail loudly on every
+# push, which is the correct behaviour: a deploy that quietly does nothing is
+# what caused the problem in the first place.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Rebuilds public/ from source rather than trusting the committed copy,
+      # so a stale hand-edit in the output cannot reach production.
+      - name: Build
+        run: node build.mjs
+
+      - name: Deploy to Cloudflare
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

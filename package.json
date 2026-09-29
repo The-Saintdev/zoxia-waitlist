@@ -1,0 +1,14 @@
+{
+  "name": "zoxia-waitlist",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Pre-launch waitlist for Zoxia, by Cresco Ai LTD.",
+  "scripts": {
+    "build": "node build.mjs",
+    "deploy": "npm run build && wrangler deploy",
+    "dev": "npm run build && wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "^3.90.0"
+  }
+}
