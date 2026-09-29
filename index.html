@@ -415,6 +415,59 @@
       font-weight: 600;
     }
 
+    /* The two research questions, and the founding member offer. Both live
+       after the email is secured, so neither adds friction to the signup. */
+    .deep-survey,
+    .founding {
+      border-top: 1px solid var(--border-hairline);
+      padding-top: var(--space-3);
+      margin-top: var(--space-3);
+    }
+
+    .deep-label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin: var(--space-2) 0 6px;
+      line-height: 1.5;
+    }
+
+    .deep-input {
+      width: 100%;
+      background-color: var(--surface-raised);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-xs);
+      color: var(--text-pure);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      line-height: 1.6;
+      padding: 8px 10px;
+      resize: vertical;
+    }
+
+    .deep-input:focus-visible {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .deep-submit {
+      margin-top: var(--space-2);
+    }
+
+    .founding-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-pure);
+      margin-bottom: 6px;
+    }
+
+    .founding-text {
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--text-muted);
+      margin-bottom: var(--space-2);
+    }
+
     .btn-spinner {
       display: none;
       width: 14px;
@@ -1149,6 +1202,50 @@
                   <button type="button" class="tag-btn" data-role="Other">Other</button>
                 </div>
                 <div class="survey-status" style="display: none;">Selection saved. Thank you!</div>
+              </div>
+
+              <!--
+                The two questions the waitlist exists to answer, and the card.
+
+                After the email rather than before it, so neither adds friction
+                to the thing we cannot recover. Free text rather than options,
+                because the wording creators use is half of what we are trying
+                to learn.
+              -->
+              <div class="deep-survey">
+                <p class="survey-question">Two questions, if you have a minute</p>
+
+                <label class="deep-label" for="q-lost">
+                  Have you ever had a scheduled post fail without knowing?
+                </label>
+                <textarea id="q-lost" class="deep-input" rows="2"
+                          placeholder="What happened, and how did you find out?"></textarea>
+
+                <label class="deep-label" for="q-proof">
+                  What do you send a brand when they ask for your numbers?
+                </label>
+                <textarea id="q-proof" class="deep-input" rows="2"
+                          placeholder="Screenshots, a media kit, or something else?"></textarea>
+
+                <button type="button" id="answers-btn" class="btn btn-primary deep-submit">
+                  <span class="btn-text">SEND ANSWERS</span>
+                  <span class="btn-spinner" aria-hidden="true"></span>
+                </button>
+                <div id="answers-feedback" class="form-feedback" role="alert" aria-live="polite"></div>
+              </div>
+
+              <div class="founding">
+                <p class="founding-title">Want your spot held?</p>
+                <p class="founding-text">
+                  Founding members pay <strong>&#8358;100 now</strong>, which becomes &#8358;100 of
+                  credit when we launch. It checks the card works and holds your place. Nothing
+                  else is charged, and we will email you before anything is.
+                </p>
+                <button type="button" id="founding-btn" class="btn btn-secondary">
+                  <span class="btn-text">BECOME A FOUNDING MEMBER</span>
+                  <span class="btn-spinner" aria-hidden="true"></span>
+                </button>
+                <div id="founding-feedback" class="form-feedback" role="alert" aria-live="polite"></div>
               </div>
             </div>
 

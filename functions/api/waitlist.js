@@ -16,9 +16,15 @@ export async function onRequestPost(context) {
   try {
     const body = await request.json();
     const email = body.email ? body.email.trim().toLowerCase() : '';
-    const role = body.role || 'Unspecified';
+    const name = body.name ? body.name.trim() : '';
+    const role = body.role || '';
     const source = body.source || 'hero';
     const submittedAt = body.submittedAt || new Date().toISOString();
+
+    // The two questions the waitlist exists to answer. Free text, because the
+    // wording creators use is half of what we are trying to learn.
+    const everLostAPost = body.everLostAPost ? String(body.everLostAPost).trim().slice(0, 600) : '';
+    const proofForBrands = body.proofForBrands ? String(body.proofForBrands).trim().slice(0, 600) : '';
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) {
@@ -32,14 +38,55 @@ export async function onRequestPost(context) {
       try {
         const clientIp = request.headers.get('CF-Connecting-IP') || '';
         const country = request.headers.get('CF-IPCountry') || '';
-        await env.WAITLIST_KV.put(`waitlist:${email}`, JSON.stringify({
+
+        /**
+         * `signee:`, not `waitlist:`.
+         *
+         * This wrote to a different key prefix than worker.js does, so
+         * whichever entry point was not deployed had its own private copy of
+         * the data, and the admin export at /api/signees reads the worker's
+         * index and would never have seen these rows at all.
+         *
+         * And read, merge, write. Everything after the first submission is an
+         * addition: the role survey, then the two questions, then the card. A
+         * plain put of a freshly built record threw away whatever came
+         * before, so answering the survey erased the answers. A blank never
+         * overwrites a value that is already there, because these arrive in
+         * separate requests and an absent field means "not sent this time",
+         * never "cleared".
+         */
+        let existing = {};
+        try {
+          const prior = await env.WAITLIST_KV.get(`signee:${email}`);
+          if (prior) existing = JSON.parse(prior);
+        } catch (e) {
+          existing = {};
+        }
+
+        await env.WAITLIST_KV.put(`signee:${email}`, JSON.stringify({
+          ...existing,
           email,
-          role,
-          source,
-          submittedAt,
-          ip: clientIp,
-          country,
+          name: name || existing.name || 'Creator',
+          role: role || existing.role || 'Unspecified',
+          source: existing.source || source,
+          submittedAt: existing.submittedAt || submittedAt,
+          ip: clientIp || existing.ip || '',
+          country: country || existing.country || '',
+          everLostAPost: everLostAPost || existing.everLostAPost || '',
+          proofForBrands: proofForBrands || existing.proofForBrands || '',
+          updatedAt: new Date().toISOString(),
         }));
+
+        // The master index the admin export reads, which this never maintained.
+        let indexList = [];
+        const existingIndex = await env.WAITLIST_KV.get('__signees_index__');
+        if (existingIndex) {
+          try { indexList = JSON.parse(existingIndex); } catch (e) {}
+        }
+        if (!indexList.includes(email)) {
+          indexList.unshift(email);
+          await env.WAITLIST_KV.put('__signees_index__', JSON.stringify(indexList));
+        }
       } catch (kvErr) {
         console.error('[KV Error]:', kvErr);
       }

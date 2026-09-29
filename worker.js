@@ -3,6 +3,8 @@
  * Handles /api/waitlist, /api/signees (export), and serves public static assets
  */
 
+import { preflight, methodNotAllowed, handleCardCheck, handleCardConfirm } from './shared/card-check.js';
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -47,7 +49,33 @@ export default {
       });
     }
 
-    // 3. Serve Static Assets
+    /**
+     * 3. The card check: POST /api/card-check, and /api/card-check/confirm
+     *
+     * The one question a waitlist cannot answer with emails. Fewer than 1% of
+     * African social media users pay for any premium subscription, so an
+     * email measures curiosity and a card measures intent, and the gap
+     * between the two is the only honest read on whether this market pays.
+     *
+     * ₦100, which becomes credit at launch. Not a pre-order: the product is
+     * gated on a TikTok review we do not control, and taking real money
+     * against a date we cannot promise turns a waitlist into a queue of angry
+     * people. Paystack waives its fee at or below ₦2,500, so this costs us
+     * nothing to collect.
+     */
+    if (url.pathname === '/api/card-check') {
+      if (request.method === 'OPTIONS') return preflight();
+      if (request.method !== 'POST') return methodNotAllowed();
+      return handleCardCheck(request, env);
+    }
+
+    if (url.pathname === '/api/card-check/confirm') {
+      if (request.method === 'OPTIONS') return preflight();
+      if (request.method !== 'POST') return methodNotAllowed();
+      return handleCardConfirm(request, env);
+    }
+
+    // 4. Serve Static Assets
     if (env.ASSETS) {
       return env.ASSETS.fetch(request);
     }
@@ -98,9 +126,23 @@ async function handleWaitlistSubmission(request, env, config) {
     const body = await request.json();
     const name = body.name ? body.name.trim() : '';
     const email = body.email ? body.email.trim().toLowerCase() : '';
-    const role = body.role || 'Unspecified';
+    const role = body.role || '';
     const source = body.source || 'hero';
     const submittedAt = body.submittedAt || new Date().toISOString();
+
+    /**
+     * The two questions the waitlist exists to answer.
+     *
+     * Free text rather than multiple choice on purpose: the wording creators
+     * use is half of what we are trying to learn, and options would hand them
+     * our own vocabulary back.
+     *
+     * The first one is the riskiest assumption in the whole product. If
+     * creators post by hand and have never had a scheduled post fail, then
+     * "your posts actually go out" solves a pain nobody has.
+     */
+    const everLostAPost = body.everLostAPost ? String(body.everLostAPost).trim().slice(0, 600) : '';
+    const proofForBrands = body.proofForBrands ? String(body.proofForBrands).trim().slice(0, 600) : '';
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) {
@@ -113,19 +155,43 @@ async function handleWaitlistSubmission(request, env, config) {
     const clientIp = request.headers.get('CF-Connecting-IP') || '';
     const country = request.headers.get('CF-IPCountry') || '';
 
-    const signeeRecord = {
-      name: name || 'Creator',
-      email,
-      role,
-      source,
-      submittedAt,
-      ip: clientIp,
-      country,
-    };
-
     // 1. Log to Cloudflare KV Database (if WAITLIST_KV is bound)
     if (env && env.WAITLIST_KV) {
       try {
+        /**
+         * Read, merge, write. Not overwrite.
+         *
+         * Everything after the first submission is an addition: the role
+         * survey, then the two questions, then the card. A plain `put` of a
+         * freshly built record threw away whatever came before, so answering
+         * the survey erased the answers and verifying a card erased both.
+         *
+         * A blank never overwrites a value that is already there, because
+         * these arrive in separate requests and an absent field means "not
+         * sent this time", never "cleared".
+         */
+        let existing = {};
+        try {
+          const prior = await env.WAITLIST_KV.get(`signee:${email}`);
+          if (prior) existing = JSON.parse(prior);
+        } catch (e) {
+          existing = {};
+        }
+
+        const signeeRecord = {
+          ...existing,
+          email,
+          name: name || existing.name || 'Creator',
+          role: role || existing.role || 'Unspecified',
+          source: existing.source || source,
+          submittedAt: existing.submittedAt || submittedAt,
+          ip: clientIp || existing.ip || '',
+          country: country || existing.country || '',
+          everLostAPost: everLostAPost || existing.everLostAPost || '',
+          proofForBrands: proofForBrands || existing.proofForBrands || '',
+          updatedAt: new Date().toISOString(),
+        };
+
         await env.WAITLIST_KV.put(`signee:${email}`, JSON.stringify(signeeRecord));
 
         // Maintain Master Index of all signee emails

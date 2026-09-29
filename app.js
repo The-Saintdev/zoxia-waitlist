@@ -74,17 +74,27 @@
 
         const data = await response.json().catch(() => ({}));
 
+        /**
+         * A failure is told, not hidden.
+         *
+         * Both of these branches used to call showSuccess(), so a rejected
+         * submission and a network error both told the person they were on
+         * the list when they were not. They would never know, and they would
+         * never get the email.
+         *
+         * For a product whose entire pitch is that we tell you the truth
+         * about whether something went through, the waitlist saying "you're
+         * on the list" when nothing saved is the worst possible place for
+         * that bug to live.
+         */
         if (response.ok && data.success) {
-          console.log('[Zoxia Waitlist] Signee registered successfully:', data);
-          showSuccess();
+          showSuccess(rawEmail);
         } else {
-          const msg = data.error || 'Submission failed. Please try again.';
-          console.warn('[Zoxia Waitlist Warning]:', msg, data);
-          showSuccess();
+          showError(data.error || 'That did not save. Try again in a moment.');
         }
       } catch (err) {
-        console.warn('[Zoxia Waitlist] Fallback:', err.message);
-        showSuccess();
+        console.warn('[Zoxia Waitlist] Network error:', err.message);
+        showError('We could not reach the server. Check your connection and try again.');
       } finally {
         submitBtn.classList.remove('loading');
         submitBtn.disabled = false;
@@ -100,9 +110,12 @@
       }
     }
 
-    function showSuccess() {
+    function showSuccess(email) {
       form.style.display = 'none';
       if (successBox) successBox.style.display = 'block';
+      // Remembered so the follow-up steps in the success panel know who they
+      // belong to. They live in the hero panel but either form can open it.
+      if (email) window.__zoxiaEmail = email.toLowerCase();
     }
   }
 
@@ -140,6 +153,194 @@
         }
       });
     });
+  }
+
+  /* ==========================================================================
+     2b. The two research questions, and the founding member card
+     ========================================================================== */
+
+  /** Whoever just joined. Set by showSuccess, with the inputs as a fallback. */
+  function currentEmail() {
+    if (window.__zoxiaEmail) return window.__zoxiaEmail;
+    var hero = document.getElementById('hero-email');
+    var bottom = document.getElementById('bottom-email');
+    var value = (hero && hero.value.trim()) || (bottom && bottom.value.trim()) || '';
+    return value.toLowerCase();
+  }
+
+  function setBusy(button, busy) {
+    if (!button) return;
+    button.disabled = busy;
+    button.classList.toggle('loading', busy);
+  }
+
+  function say(el, message, isError) {
+    if (!el) return;
+    el.textContent = message;
+    el.className = 'form-feedback' + (isError ? ' error' : '');
+  }
+
+  /**
+   * The answers, sent after the email is already safe.
+   *
+   * These are the reason the waitlist exists. The first question is the
+   * riskiest assumption in the product: if creators have never had a
+   * scheduled post fail, then "your posts actually go out" solves a pain
+   * nobody has, and that is worth knowing before the content plan runs.
+   */
+  function setupDeepSurvey() {
+    var button = document.getElementById('answers-btn');
+    var feedback = document.getElementById('answers-feedback');
+    var lost = document.getElementById('q-lost');
+    var proof = document.getElementById('q-proof');
+    if (!button || !lost || !proof) return;
+
+    button.addEventListener('click', function () {
+      var email = currentEmail();
+      if (!email) {
+        say(feedback, 'We lost track of your email. Refresh and join again.', true);
+        return;
+      }
+
+      var everLostAPost = lost.value.trim();
+      var proofForBrands = proof.value.trim();
+      if (!everLostAPost && !proofForBrands) {
+        say(feedback, 'Either box is fine, both is better.', true);
+        return;
+      }
+
+      setBusy(button, true);
+      say(feedback, '');
+
+      fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          everLostAPost: everLostAPost || undefined,
+          proofForBrands: proofForBrands || undefined,
+          source: 'answers',
+        }),
+      })
+        .then(function (r) { return r.json().catch(function () { return {}; }); })
+        .then(function (data) {
+          if (data && data.success) {
+            say(feedback, 'Got it. That genuinely helps.');
+            lost.disabled = true;
+            proof.disabled = true;
+            button.style.display = 'none';
+          } else {
+            say(feedback, (data && data.error) || 'That did not save. Try again.', true);
+            setBusy(button, false);
+          }
+        })
+        .catch(function () {
+          say(feedback, 'We could not reach the server. Try again.', true);
+          setBusy(button, false);
+        });
+    });
+  }
+
+  /**
+   * The card, which is the measurement.
+   *
+   * Offered beside the email path rather than instead of it, because a
+   * mandatory card measures nothing: the gap between the two is the finding.
+   */
+  function setupFounding() {
+    var button = document.getElementById('founding-btn');
+    var feedback = document.getElementById('founding-feedback');
+    if (!button) return;
+
+    button.addEventListener('click', function () {
+      var email = currentEmail();
+      if (!email) {
+        say(feedback, 'We lost track of your email. Refresh and join again.', true);
+        return;
+      }
+
+      setBusy(button, true);
+      say(feedback, '');
+
+      fetch('/api/card-check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email }),
+      })
+        .then(function (r) { return r.json().catch(function () { return {}; }); })
+        .then(function (data) {
+          if (data && data.authorizationUrl) {
+            window.location.href = data.authorizationUrl;
+            return;
+          }
+          if (data && data.unavailable) {
+            // Not an error. Their place is already held either way, and
+            // saying "failed" about something that did not fail is the habit
+            // this whole product is against.
+            say(feedback, 'Founding spots are not open yet. You are on the list regardless.');
+            button.style.display = 'none';
+            return;
+          }
+          say(feedback, (data && data.error) || 'Could not start that. Nothing was charged.', true);
+          setBusy(button, false);
+        })
+        .catch(function () {
+          say(feedback, 'We could not reach the server. Nothing was charged.', true);
+          setBusy(button, false);
+        });
+    });
+  }
+
+  /**
+   * Coming back from Paystack.
+   *
+   * Reports, never grants. Their place was taken before they left, so the
+   * worst case is a page that cannot confirm the card, and it says that
+   * rather than implying the signup failed.
+   */
+  function handleCardReturn() {
+    var params = new URLSearchParams(window.location.search);
+    if (!params.get('card')) return;
+
+    var reference = params.get('reference') || params.get('trxref') || '';
+    var success = document.getElementById('hero-success');
+    var form = document.getElementById('hero-form');
+    if (!success) return;
+
+    form && (form.style.display = 'none');
+    success.style.display = 'block';
+    success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    var title = success.querySelector('.success-title');
+    var text = success.querySelector('.success-text');
+
+    fetch('/api/card-check/confirm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reference: reference }),
+    })
+      .then(function (r) { return r.json().catch(function () { return {}; }); })
+      .then(function (data) {
+        if (data && data.verified) {
+          if (title) title.textContent = 'You are a founding member.';
+          if (text) {
+            text.textContent = data.last4
+              ? 'Card ending ' + data.last4 + ' checked. Nothing else will be charged, and your ₦100 becomes credit at launch.'
+              : 'Card checked. Nothing else will be charged, and your ₦100 becomes credit at launch.';
+          }
+          var founding = document.querySelector('.founding');
+          if (founding) founding.style.display = 'none';
+          return;
+        }
+        throw new Error('unconfirmed');
+      })
+      .catch(function () {
+        if (title) title.textContent = 'You are on the list.';
+        if (text) {
+          text.textContent =
+            'We could not confirm the card from this page, which does not mean it failed. Your place is held, and we will sort the rest out before anything is charged.';
+        }
+      });
   }
 
   /* ==========================================================================
@@ -241,6 +442,9 @@
     setupForm('hero-form', 'hero-name', 'hero-email', 'hero-feedback', 'hero-success', 'hero');
     setupForm('bottom-form', 'bottom-name', 'bottom-email', 'bottom-feedback', 'bottom-success', 'bottom');
     setupSurvey();
+    setupDeepSurvey();
+    setupFounding();
+    handleCardReturn();
     setupQueuePreview();
     setupShowcaseTabs();
     setupModals();
