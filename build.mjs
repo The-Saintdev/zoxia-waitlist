@@ -18,7 +18,7 @@
 import { cp, mkdir, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 
-const FILES = ['index.html', 'app.js', 'styles.css'];
+const FILES = ['index.html', 'app.js'];
 const DIRS = ['assets'];
 const OUT = 'public';
 

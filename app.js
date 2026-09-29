@@ -1,183 +1,176 @@
 /**
- * ZOXIA Waitlist — Client Application
- * Domain: https://zoxia.site
- * Parent Company: Cresco Ai LTD
+ * ZOXIA WAITLIST
+ * https://zoxia.site, by Cresco Ai LTD
+ *
+ * Three jobs, in the order they matter:
+ *   1. Take an email and say honestly whether it saved.
+ *   2. Ask the two research questions, but only after the email is safe.
+ *   3. Resolve the record in the hero, and reveal sections on scroll.
+ *
+ * No scroll listeners anywhere. IntersectionObserver only.
  */
-
 (function () {
   'use strict';
 
-  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  /* ==========================================================================
-     1. Form Controller (Name + Email)
-     ========================================================================== */
-  function setupForm(formId, nameId, emailId, feedbackId, successId, source) {
-    const form = document.getElementById(formId);
-    const nameInput = document.getElementById(nameId);
-    const emailInput = document.getElementById(emailId);
-    const feedback = document.getElementById(feedbackId);
-    const successBox = document.getElementById(successId);
-    const submitBtn = form?.querySelector('.btn-primary');
+  /* Lets CSS know it may hide things it will later animate in. Without JS
+     every element stays visible, which is the correct fallback. */
+  document.documentElement.classList.add('js');
 
-    if (!form || !emailInput || !submitBtn) return;
+  /** Whoever just joined, set on a successful submit. */
+  var joinedEmail = '';
 
-    // Clear feedback on input
-    [nameInput, emailInput].forEach((input) => {
-      if (input) {
-        input.addEventListener('input', () => {
-          if (feedback) {
-            feedback.textContent = '';
-            feedback.className = 'form-feedback';
-          }
-        });
-      }
-    });
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const rawName = nameInput ? nameInput.value.trim() : '';
-      const rawEmail = emailInput.value.trim();
-
-      if (!rawEmail) {
-        showError('Please enter your email address.');
-        emailInput.focus();
-        return;
-      }
-
-      if (!EMAIL_REGEX.test(rawEmail)) {
-        showError('Please enter a valid email address.');
-        emailInput.focus();
-        return;
-      }
-
-      submitBtn.classList.add('loading');
-      submitBtn.disabled = true;
-      if (nameInput) nameInput.disabled = true;
-      emailInput.disabled = true;
-      if (feedback) feedback.textContent = '';
-
-      try {
-        const response = await fetch('/api/waitlist', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-          body: JSON.stringify({
-            name: rawName,
-            email: rawEmail.toLowerCase(),
-            source: source,
-            submittedAt: new Date().toISOString(),
-          }),
-        });
-
-        const data = await response.json().catch(() => ({}));
-
-        /**
-         * A failure is told, not hidden.
-         *
-         * Both of these branches used to call showSuccess(), so a rejected
-         * submission and a network error both told the person they were on
-         * the list when they were not. They would never know, and they would
-         * never get the email.
-         *
-         * For a product whose entire pitch is that we tell you the truth
-         * about whether something went through, the waitlist saying "you're
-         * on the list" when nothing saved is the worst possible place for
-         * that bug to live.
-         */
-        if (response.ok && data.success) {
-          showSuccess(rawEmail);
-        } else {
-          showError(data.error || 'That did not save. Try again in a moment.');
-        }
-      } catch (err) {
-        console.warn('[Zoxia Waitlist] Network error:', err.message);
-        showError('We could not reach the server. Check your connection and try again.');
-      } finally {
-        submitBtn.classList.remove('loading');
-        submitBtn.disabled = false;
-        if (nameInput) nameInput.disabled = false;
-        emailInput.disabled = false;
-      }
-    });
-
-    function showError(msg) {
-      if (feedback) {
-        feedback.textContent = msg;
-        feedback.className = 'form-feedback error';
-      }
-    }
-
-    function showSuccess(email) {
-      form.style.display = 'none';
-      if (successBox) successBox.style.display = 'block';
-      // Remembered so the follow-up steps in the success panel know who they
-      // belong to. They live in the hero panel but either form can open it.
-      if (email) window.__zoxiaEmail = email.toLowerCase();
-    }
-  }
-
-  /* ==========================================================================
-     2. Optional Secondary Survey
-     ========================================================================== */
-  function setupSurvey() {
-    const tagButtons = document.querySelectorAll('.role-btn');
-    const statusText = document.querySelector('.survey-status');
-
-    tagButtons.forEach((btn) => {
-      btn.addEventListener('click', async () => {
-        const role = btn.getAttribute('data-role');
-        tagButtons.forEach((b) => b.classList.remove('selected'));
-        btn.classList.add('selected');
-
-        if (statusText) statusText.style.display = 'block';
-
-        const heroEmail = document.getElementById('hero-email');
-        const heroName = document.getElementById('hero-name');
-        const email = heroEmail ? heroEmail.value.trim() : '';
-        const name = heroName ? heroName.value.trim() : '';
-
-        if (email) {
-          fetch('/api/waitlist', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              name: name,
-              email: email.toLowerCase(),
-              role: role,
-              source: 'survey',
-            }),
-          }).catch(() => {});
-        }
-      });
-    });
-  }
-
-  /* ==========================================================================
-     2b. The two research questions
-     ========================================================================== */
-
-  /** Whoever just joined. Set by showSuccess, with the inputs as a fallback. */
-  function currentEmail() {
-    if (window.__zoxiaEmail) return window.__zoxiaEmail;
-    var hero = document.getElementById('hero-email');
-    var bottom = document.getElementById('bottom-email');
-    var value = (hero && hero.value.trim()) || (bottom && bottom.value.trim()) || '';
-    return value.toLowerCase();
-  }
-
-  function setBusy(button, busy) {
-    if (!button) return;
-    button.disabled = busy;
-    button.classList.toggle('loading', busy);
+  function setBusy(btn, busy) {
+    if (!btn) return;
+    btn.disabled = busy;
+    btn.classList.toggle('loading', busy);
   }
 
   function say(el, message, isError) {
     if (!el) return;
-    el.textContent = message;
-    el.className = 'form-feedback' + (isError ? ' error' : '');
+    el.textContent = message || '';
+    el.className = 'feedback' + (isError ? ' error' : '');
+  }
+
+  /* ==========================================================================
+     1. The email
+     ========================================================================== */
+  function setupForm(formId, nameId, emailId, feedbackId, joinedId, source) {
+    var form = document.getElementById(formId);
+    var nameInput = document.getElementById(nameId);
+    var emailInput = document.getElementById(emailId);
+    var feedback = document.getElementById(feedbackId);
+    var joined = document.getElementById(joinedId);
+    if (!form || !emailInput) return;
+
+    var button = form.querySelector('button[type="submit"]');
+
+    [nameInput, emailInput].forEach(function (input) {
+      if (input) input.addEventListener('input', function () { say(feedback, ''); });
+    });
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      var name = nameInput ? nameInput.value.trim() : '';
+      var email = emailInput.value.trim();
+
+      if (!email) {
+        say(feedback, 'Please enter your email address.', true);
+        emailInput.focus();
+        return;
+      }
+      if (!EMAIL.test(email)) {
+        say(feedback, 'That does not look like an email address.', true);
+        emailInput.focus();
+        return;
+      }
+
+      setBusy(button, true);
+      if (nameInput) nameInput.disabled = true;
+      emailInput.disabled = true;
+      say(feedback, '');
+
+      fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          name: name,
+          email: email.toLowerCase(),
+          source: source,
+          submittedAt: new Date().toISOString(),
+        }),
+      })
+        .then(function (r) {
+          return r.json().catch(function () { return {}; }).then(function (data) {
+            return { ok: r.ok, data: data };
+          });
+        })
+        .then(function (res) {
+          /**
+           * A failure is told, not hidden.
+           *
+           * Both branches here used to report success, so a rejected save and
+           * a dead network both told someone they were on the list when they
+           * were not. For a product whose entire pitch is that it tells you
+           * the truth about whether something went through, that is the worst
+           * possible place for that bug to live.
+           */
+          if (res.ok && res.data && res.data.success) {
+            joinedEmail = email.toLowerCase();
+            form.style.display = 'none';
+            if (joined) joined.setAttribute('data-open', 'true');
+          } else {
+            say(feedback, (res.data && res.data.error) || 'That did not save. Try again in a moment.', true);
+            restore();
+          }
+        })
+        .catch(function () {
+          say(feedback, 'We could not reach the server, so nothing was saved. Check your connection and try again.', true);
+          restore();
+        });
+
+      function restore() {
+        setBusy(button, false);
+        if (nameInput) nameInput.disabled = false;
+        emailInput.disabled = false;
+      }
+    });
+  }
+
+  /* ==========================================================================
+     2. The two questions, and the role
+     ========================================================================== */
+
+  /**
+   * Either form can open the panel, so the email is whichever one was used.
+   * Reading a single hard-coded input here meant a signup from the bottom
+   * form silently dropped its role and answers.
+   */
+  function currentEmail() {
+    if (joinedEmail) return joinedEmail;
+    var ids = ['email-top', 'email-bottom'];
+    for (var i = 0; i < ids.length; i++) {
+      var el = document.getElementById(ids[i]);
+      if (el && el.value.trim()) return el.value.trim().toLowerCase();
+    }
+    return '';
+  }
+
+  function setupRoles() {
+    var buttons = document.querySelectorAll('.role');
+    var feedback = document.getElementById('role-feedback');
+    if (!buttons.length) return;
+
+    Array.prototype.forEach.call(buttons, function (btn) {
+      btn.addEventListener('click', function () {
+        var email = currentEmail();
+        if (!email) {
+          say(feedback, 'We lost track of your email. Refresh and join again.', true);
+          return;
+        }
+
+        Array.prototype.forEach.call(buttons, function (b) {
+          b.setAttribute('aria-pressed', String(b === btn));
+        });
+
+        fetch('/api/waitlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: email,
+            role: btn.getAttribute('data-role'),
+            source: 'survey',
+          }),
+        })
+          .then(function (r) { return r.json().catch(function () { return {}; }); })
+          .then(function (data) {
+            say(feedback, data && data.success ? 'Saved, thank you.' : 'That did not save.', !(data && data.success));
+          })
+          .catch(function () { say(feedback, 'That did not save.', true); });
+      });
+    });
   }
 
   /**
@@ -186,9 +179,9 @@
    * These are the reason the waitlist exists. The first question is the
    * riskiest assumption in the product: if creators have never had a
    * scheduled post fail, then "your posts actually go out" solves a pain
-   * nobody has, and that is worth knowing before the content plan runs.
+   * nobody has, and that is worth knowing before the marketing runs.
    */
-  function setupDeepSurvey() {
+  function setupAnswers() {
     var button = document.getElementById('answers-btn');
     var feedback = document.getElementById('answers-feedback');
     var lost = document.getElementById('q-lost');
@@ -242,108 +235,67 @@
   }
 
   /* ==========================================================================
-     3. Interactive Hero Queue Selector
+     3. Motion, of which there is deliberately little
      ========================================================================== */
-  function setupQueuePreview() {
-    const queueRows = document.querySelectorAll('.preview-row');
-    queueRows.forEach((row) => {
-      row.addEventListener('click', () => {
-        queueRows.forEach((r) => r.classList.remove('active'));
-        row.classList.add('active');
+
+  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /**
+   * The record resolves one row at a time because that is what actually
+   * happens: confirmations come back from each platform at different times.
+   * It runs once, when it first comes into view, and then stops.
+   */
+  function setupRecord() {
+    var record = document.getElementById('record');
+    if (!record) return;
+    if (still || !('IntersectionObserver' in window)) {
+      record.classList.add('resolved');
+      return;
+    }
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        record.classList.add('resolved');
+        io.disconnect();
       });
-    });
+    }, { threshold: 0.35 });
+
+    io.observe(record);
   }
 
-  /* ==========================================================================
-     4. Showcase Tabs Switcher
-     ========================================================================== */
-  function setupShowcaseTabs() {
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    const panels = document.querySelectorAll('.showcase-card');
+  function setupReveal() {
+    var items = document.querySelectorAll('.reveal');
+    if (!items.length) return;
+    if (still || !('IntersectionObserver' in window)) {
+      Array.prototype.forEach.call(items, function (el) { el.classList.add('seen'); });
+      return;
+    }
 
-    tabButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        const targetTab = button.getAttribute('data-tab');
-
-        tabButtons.forEach((btn) => {
-          btn.classList.remove('active');
-          btn.setAttribute('aria-selected', 'false');
-        });
-        button.classList.add('active');
-        button.setAttribute('aria-selected', 'true');
-
-        panels.forEach((p) => p.classList.remove('active'));
-        const activePanel = document.getElementById(`panel-${targetTab}`);
-        if (activePanel) {
-          activePanel.classList.add('active');
-        }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('seen');
+        io.unobserve(entry.target);
       });
-    });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    Array.prototype.forEach.call(items, function (el) { io.observe(el); });
   }
 
-  /* ==========================================================================
-     5. Accessible Modals (Privacy & Terms)
-     ========================================================================== */
-  function setupModals() {
-    const modal = document.getElementById('legal-modal');
-    const modalTitle = document.getElementById('modal-title');
-    const modalBody = document.getElementById('modal-body');
-    const openTriggers = document.querySelectorAll('[data-modal]');
-    const closeTriggers = document.querySelectorAll('[data-close-modal]');
-
-    if (!modal) return;
-
-    openTriggers.forEach((trigger) => {
-      trigger.addEventListener('click', (e) => {
-        e.preventDefault();
-        const type = trigger.getAttribute('data-modal');
-
-        if (type === 'privacy') {
-          modalTitle.textContent = 'Privacy Policy';
-          modalBody.innerHTML = `
-            <p style="margin-bottom:12px;"><strong>Zoxia by Cresco Ai LTD</strong></p>
-            <p style="margin-bottom:12px;">We collect your name and email address solely for early-access invitations and product updates. We never sell, rent, or distribute your data.</p>
-            <p>You may request deletion of your entry at any time by contacting contact@cresco.ai.</p>
-          `;
-        } else if (type === 'terms') {
-          modalTitle.textContent = 'Terms of Service';
-          modalBody.innerHTML = `
-            <p style="margin-bottom:12px;"><strong>Zoxia Pre-Launch Terms</strong></p>
-            <p>Zoxia is in active pre-launch testing. Early-access invitations are granted on a rolling cohort basis.</p>
-          `;
-        }
-
-        modal.classList.add('open');
-        modal.setAttribute('aria-hidden', 'false');
-      });
-    });
-
-    closeTriggers.forEach((closeBtn) => {
-      closeBtn.addEventListener('click', () => {
-        modal.classList.remove('open');
-        modal.setAttribute('aria-hidden', 'true');
-      });
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && modal.classList.contains('open')) {
-        modal.classList.remove('open');
-        modal.setAttribute('aria-hidden', 'true');
-      }
-    });
+  /* ========================================================================== */
+  function init() {
+    setupForm('form-top', 'name-top', 'email-top', 'feedback-top', 'joined-top', 'hero');
+    setupForm('form-bottom', 'name-bottom', 'email-bottom', 'feedback-bottom', 'joined-bottom', 'footer');
+    setupRoles();
+    setupAnswers();
+    setupRecord();
+    setupReveal();
   }
 
-  /* ==========================================================================
-     6. DOM Ready Initialization
-     ========================================================================== */
-  document.addEventListener('DOMContentLoaded', () => {
-    setupForm('hero-form', 'hero-name', 'hero-email', 'hero-feedback', 'hero-success', 'hero');
-    setupForm('bottom-form', 'bottom-name', 'bottom-email', 'bottom-feedback', 'bottom-success', 'bottom');
-    setupSurvey();
-    setupDeepSurvey();
-    setupQueuePreview();
-    setupShowcaseTabs();
-    setupModals();
-  });
-
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();
