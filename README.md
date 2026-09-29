@@ -47,7 +47,7 @@ zoxia.site is a **Cloudflare Worker** named `zoxia-waitlist` (not a Pages projec
 - `worker.js` handles every `/api/*` route. Everything else is served from `public/`.
 - `public/` is output. Edit the files at the root and run `npm run build` to copy them in, then commit both.
 - `wrangler.json` declares the `WAITLIST_KV` binding. Any binding added in the dashboard must also be added here, or the next deploy removes it.
-- Secrets (`RESEND_API_KEY`, and `PAYSTACK_SECRET_KEY` if the founding card is switched on) live in the dashboard and survive deploys.
+- Secrets (`RESEND_API_KEY`) live in the dashboard and survive deploys.
 
 To deploy by hand: `npx wrangler login` once, then `npm run deploy`.
 

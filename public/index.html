@@ -393,10 +393,9 @@
       font-weight: 600;
     }
 
-    /* The two research questions, and the founding member offer. Both live
-       after the email is secured, so neither adds friction to the signup. */
-    .deep-survey,
-    .founding {
+    /* The two research questions. They live after the email is secured, so
+       they add no friction to the signup. */
+    .deep-survey {
       border-top: 1px solid var(--border-hairline);
       padding-top: var(--space-3);
       margin-top: var(--space-3);
@@ -430,20 +429,6 @@
 
     .deep-submit {
       margin-top: var(--space-2);
-    }
-
-    .founding-title {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-pure);
-      margin-bottom: 6px;
-    }
-
-    .founding-text {
-      font-size: 12px;
-      line-height: 1.6;
-      color: var(--text-muted);
-      margin-bottom: var(--space-2);
     }
 
 
@@ -1293,9 +1278,9 @@
               </div>
 
               <!--
-                The two questions the waitlist exists to answer, and the card.
+                The two questions the waitlist exists to answer.
 
-                After the email rather than before it, so neither adds friction
+                After the email rather than before it, so they add no friction
                 to the thing we cannot recover. Free text rather than options,
                 because the wording creators use is half of what we are trying
                 to learn.
@@ -1320,20 +1305,6 @@
                   <span class="btn-spinner" aria-hidden="true"></span>
                 </button>
                 <div id="answers-feedback" class="form-feedback" role="alert" aria-live="polite"></div>
-              </div>
-
-              <div class="founding">
-                <p class="founding-title">Want your spot held?</p>
-                <p class="founding-text">
-                  Founding members pay <strong>&#8358;100 now</strong>, which becomes &#8358;100 of
-                  credit when we launch. It checks the card works and holds your place. Nothing
-                  else is charged, and we will email you before anything is.
-                </p>
-                <button type="button" id="founding-btn" class="btn btn-secondary">
-                  <span class="btn-text">BECOME A FOUNDING MEMBER</span>
-                  <span class="btn-spinner" aria-hidden="true"></span>
-                </button>
-                <div id="founding-feedback" class="form-feedback" role="alert" aria-live="polite"></div>
               </div>
             </div>
 

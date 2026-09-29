@@ -3,8 +3,6 @@
  * Handles /api/waitlist, /api/signees (export), and serves public static assets
  */
 
-import { preflight, methodNotAllowed, handleCardCheck, handleCardConfirm } from './shared/card-check.js';
-
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -49,33 +47,7 @@ export default {
       });
     }
 
-    /**
-     * 3. The card check: POST /api/card-check, and /api/card-check/confirm
-     *
-     * The one question a waitlist cannot answer with emails. Fewer than 1% of
-     * African social media users pay for any premium subscription, so an
-     * email measures curiosity and a card measures intent, and the gap
-     * between the two is the only honest read on whether this market pays.
-     *
-     * ₦100, which becomes credit at launch. Not a pre-order: the product is
-     * gated on a TikTok review we do not control, and taking real money
-     * against a date we cannot promise turns a waitlist into a queue of angry
-     * people. Paystack waives its fee at or below ₦2,500, so this costs us
-     * nothing to collect.
-     */
-    if (url.pathname === '/api/card-check') {
-      if (request.method === 'OPTIONS') return preflight();
-      if (request.method !== 'POST') return methodNotAllowed();
-      return handleCardCheck(request, env);
-    }
-
-    if (url.pathname === '/api/card-check/confirm') {
-      if (request.method === 'OPTIONS') return preflight();
-      if (request.method !== 'POST') return methodNotAllowed();
-      return handleCardConfirm(request, env);
-    }
-
-    // 4. Serve Static Assets
+    // 3. Serve Static Assets
     if (env.ASSETS) {
       return env.ASSETS.fetch(request);
     }
@@ -162,9 +134,9 @@ async function handleWaitlistSubmission(request, env, config) {
          * Read, merge, write. Not overwrite.
          *
          * Everything after the first submission is an addition: the role
-         * survey, then the two questions, then the card. A plain `put` of a
+         * survey, then the two questions. A plain `put` of a
          * freshly built record threw away whatever came before, so answering
-         * the survey erased the answers and verifying a card erased both.
+         * the survey erased the answers.
          *
          * A blank never overwrites a value that is already there, because
          * these arrive in separate requests and an absent field means "not

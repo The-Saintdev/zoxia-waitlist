@@ -156,7 +156,7 @@
   }
 
   /* ==========================================================================
-     2b. The two research questions, and the founding member card
+     2b. The two research questions
      ========================================================================== */
 
   /** Whoever just joined. Set by showSuccess, with the inputs as a fallback. */
@@ -239,108 +239,6 @@
           setBusy(button, false);
         });
     });
-  }
-
-  /**
-   * The card, which is the measurement.
-   *
-   * Offered beside the email path rather than instead of it, because a
-   * mandatory card measures nothing: the gap between the two is the finding.
-   */
-  function setupFounding() {
-    var button = document.getElementById('founding-btn');
-    var feedback = document.getElementById('founding-feedback');
-    if (!button) return;
-
-    button.addEventListener('click', function () {
-      var email = currentEmail();
-      if (!email) {
-        say(feedback, 'We lost track of your email. Refresh and join again.', true);
-        return;
-      }
-
-      setBusy(button, true);
-      say(feedback, '');
-
-      fetch('/api/card-check', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email }),
-      })
-        .then(function (r) { return r.json().catch(function () { return {}; }); })
-        .then(function (data) {
-          if (data && data.authorizationUrl) {
-            window.location.href = data.authorizationUrl;
-            return;
-          }
-          if (data && data.unavailable) {
-            // Not an error. Their place is already held either way, and
-            // saying "failed" about something that did not fail is the habit
-            // this whole product is against.
-            say(feedback, 'Founding spots are not open yet. You are on the list regardless.');
-            button.style.display = 'none';
-            return;
-          }
-          say(feedback, (data && data.error) || 'Could not start that. Nothing was charged.', true);
-          setBusy(button, false);
-        })
-        .catch(function () {
-          say(feedback, 'We could not reach the server. Nothing was charged.', true);
-          setBusy(button, false);
-        });
-    });
-  }
-
-  /**
-   * Coming back from Paystack.
-   *
-   * Reports, never grants. Their place was taken before they left, so the
-   * worst case is a page that cannot confirm the card, and it says that
-   * rather than implying the signup failed.
-   */
-  function handleCardReturn() {
-    var params = new URLSearchParams(window.location.search);
-    if (!params.get('card')) return;
-
-    var reference = params.get('reference') || params.get('trxref') || '';
-    var success = document.getElementById('hero-success');
-    var form = document.getElementById('hero-form');
-    if (!success) return;
-
-    form && (form.style.display = 'none');
-    success.style.display = 'block';
-    success.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-    var title = success.querySelector('.success-title');
-    var text = success.querySelector('.success-text');
-
-    fetch('/api/card-check/confirm', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reference: reference }),
-    })
-      .then(function (r) { return r.json().catch(function () { return {}; }); })
-      .then(function (data) {
-        if (data && data.verified) {
-          if (title) title.textContent = 'You are a founding member.';
-          if (text) {
-            text.textContent = data.last4
-              ? 'Card ending ' + data.last4 + ' checked. Nothing else will be charged, and your ₦100 becomes credit at launch.'
-              : 'Card checked. Nothing else will be charged, and your ₦100 becomes credit at launch.';
-          }
-          var founding = document.querySelector('.founding');
-          if (founding) founding.style.display = 'none';
-          return;
-        }
-        throw new Error('unconfirmed');
-      })
-      .catch(function () {
-        if (title) title.textContent = 'You are on the list.';
-        if (text) {
-          text.textContent =
-            'We could not confirm the card from this page, which does not mean it failed. Your place is held, and we will sort the rest out before anything is charged.';
-        }
-      });
   }
 
   /* ==========================================================================
@@ -443,8 +341,6 @@
     setupForm('bottom-form', 'bottom-name', 'bottom-email', 'bottom-feedback', 'bottom-success', 'bottom');
     setupSurvey();
     setupDeepSurvey();
-    setupFounding();
-    handleCardReturn();
     setupQueuePreview();
     setupShowcaseTabs();
     setupModals();
