@@ -22,7 +22,7 @@
   <meta name="twitter:image" content="https://zoxia.site/assets/logo-standalone.png">
 
   <!-- Favicons -->
-  <meta name="theme-color" content="#0b0812">
+  <meta name="theme-color" content="#ffffff">
   <link rel="icon" type="image/png" href="assets/logo-standalone.png">
   <link rel="apple-touch-icon" href="assets/logo-standalone.png">
 
@@ -43,17 +43,18 @@
     /* ==========================================================================
        ZOXIA WAITLIST
 
-       The design idea, so nobody has to guess at it later:
+       Light, flat, and loud, because the audience is creators and the
+       previous version read like a server dashboard.
 
-       The product exists because a scheduler's claim ("Published") and the
-       platform's answer are two different things. So the page speaks in two
-       voices, and never mixes them up.
+       Two rules that keep it honest:
 
-         Sans (Geist)       our voice. Claims, copy, the ask.
-         Mono (Geist Mono)  the platform's voice. Records, statuses, times.
-
-       Teal is not decoration. Teal means a platform confirmed something.
-       Orchid is us. Nothing else gets a colour.
+       1. NO GRADIENTS, NO GLOWS. Colour arrives as solid blocks. Every
+          soft purple wash on a dark canvas is the house style of a page
+          nobody designed.
+       2. Two voices. Sans (Geist) is us. Mono (Geist Mono) is the
+          platform: statuses, times, the things we did not write. Green
+          means a platform confirmed. Red means one refused. Neither
+          colour is ever used for decoration.
        ========================================================================== */
 
     @font-face {
@@ -90,40 +91,45 @@
     }
 
     :root {
-      /* Ours */
-      --accent: #c77fc4;
-      --accent-bright: #dda0da;
-      --accent-deep: #7b3c85;
+      --ink: #17121d;
+      --ink-2: #57505f;
+      --ink-3: #7d7588;
 
-      /* The platform's answer, and only that */
-      --confirmed: #5be7d4;
-      --refused: #f0857f;
+      --paper: #ffffff;
+      --paper-2: #f7f4f9;
+      --line: #e6e0ec;
+      --line-2: #d3cadb;
 
-      --canvas: #0b0812;
-      --surface: #14101d;
-      --surface-2: #1b1526;
+      /* Brand */
+      --violet: #7a2e9d;
+      --violet-dark: #5f2179;
 
-      --text: #f4f1f8;
-      --text-2: #b3aabf;
-      --text-3: #857c93;
+      /* Solid panels. No gradient ever goes in one of these. */
+      --panel-violet: #ebdcf4;
+      --panel-mint: #cbf1e6;
+      --panel-butter: #fbe7b3;
+      --panel-blush: #fbdcd5;
 
-      --line: rgba(255, 255, 255, 0.09);
-      --line-2: rgba(255, 255, 255, 0.16);
+      /* What the platform said, dark enough to read on light panels */
+      --ok: #0b7360;
+      --no: #b83a29;
 
-      /* One radius system. Nothing is a pill. */
-      --r-sm: 4px;
-      --r-md: 8px;
+      --r-ctl: 12px;
+      --r-panel: 20px;
+
+      --shadow: 0 1px 2px rgba(23, 18, 29, 0.05), 0 10px 28px rgba(23, 18, 29, 0.07);
+      --shadow-sm: 0 1px 2px rgba(23, 18, 29, 0.06), 0 4px 12px rgba(23, 18, 29, 0.05);
 
       --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
       --ease: cubic-bezier(0.16, 1, 0.3, 1);
       --gutter: 20px;
-      --measure: 1180px;
+      --measure: 1140px;
     }
 
-    @media (min-width: 768px)  { :root { --gutter: 40px; } }
-    @media (min-width: 1200px) { :root { --gutter: 56px; } }
+    @media (min-width: 768px)  { :root { --gutter: 32px; } }
+    @media (min-width: 1200px) { :root { --gutter: 48px; } }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -132,9 +138,9 @@
 
     body {
       font-family: var(--font-sans);
-      background: var(--canvas);
-      color: var(--text);
-      font-size: 16px;
+      background: var(--paper);
+      color: var(--ink);
+      font-size: 17px;
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
@@ -151,9 +157,9 @@
     a { color: inherit; }
 
     :focus-visible {
-      outline: 2px solid var(--accent-bright);
-      outline-offset: 3px;
-      border-radius: 2px;
+      outline: 3px solid var(--violet);
+      outline-offset: 2px;
+      border-radius: 4px;
     }
 
     .sr-only {
@@ -162,22 +168,16 @@
       clip: rect(0 0 0 0); white-space: nowrap; border: 0;
     }
 
-    /* ----------------------------------------------------------- navigation --
-       One line, 64px, two things in it. */
+    /* ----------------------------------------------------------- navigation -- */
     .nav {
       position: sticky;
       top: 0;
       z-index: 20;
-      height: 64px;
+      height: 68px;
       display: flex;
       align-items: center;
-      background: rgba(11, 8, 18, 0.82);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      background: var(--paper);
       border-bottom: 1px solid var(--line);
-    }
-    @media (prefers-reduced-transparency: reduce) {
-      .nav { background: var(--canvas); backdrop-filter: none; -webkit-backdrop-filter: none; }
     }
 
     .nav-inner {
@@ -196,195 +196,278 @@
       align-items: center;
       gap: 9px;
       text-decoration: none;
-      color: var(--text);
+      color: var(--ink);
     }
-    .brand svg { width: 19px; height: 19px; display: block; color: var(--accent); }
-    .brand-name {
-      font-size: 16px;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-    }
+    .brand svg { width: 21px; height: 21px; display: block; color: var(--violet); }
+    .brand-name { font-size: 19px; font-weight: 600; letter-spacing: -0.03em; }
 
-    .nav-cta {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-2);
-      text-decoration: none;
-      padding: 7px 13px;
-      border: 1px solid var(--line-2);
-      border-radius: var(--r-sm);
-      transition: color 150ms var(--ease), border-color 150ms var(--ease), background-color 150ms var(--ease);
-      white-space: nowrap;
-    }
-    .nav-cta:hover { color: var(--text); border-color: var(--accent); background: rgba(199, 127, 196, 0.08); }
-
-    /* ----------------------------------------------------------------- hero --
-       Asymmetric split. Copy and the ask on the left, the record on the
-       right, because the record is the argument. */
-    .hero {
-      padding-top: 56px;
-      padding-bottom: 72px;
-      position: relative;
-      /* Clips the wash below. Without it the glow sits 180px past the right
-         edge and drags a horizontal scrollbar onto every phone. */
-      overflow: hidden;
-    }
-    @media (min-width: 900px) {
-      .hero { padding-top: 84px; padding-bottom: 104px; }
-    }
-
-    /* One wash, behind the record, so the dark is not flat. */
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: -130px; right: -180px;
-      width: 720px; height: 620px;
-      background: radial-gradient(circle, rgba(123, 60, 133, 0.30), transparent 66%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .hero-grid {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 48px;
-    }
-    @media (min-width: 900px) {
-      .hero-grid {
-        grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-        gap: 64px;
-        align-items: start;
-      }
-    }
-
-    h1 {
-      font-size: clamp(38px, 7.4vw, 62px);
-      font-weight: 600;
-      letter-spacing: -0.035em;
-      line-height: 1.04;
-      margin-bottom: 20px;
-      max-width: 13ch;
-    }
-
-    .hero-sub {
-      font-size: clamp(16px, 2.1vw, 18.5px);
-      line-height: 1.55;
-      color: var(--text-2);
-      max-width: 46ch;
-      margin-bottom: 34px;
-    }
-    .hero-sub strong { color: var(--text); font-weight: 500; }
-
-    /* ----------------------------------------------------------------- form -- */
-    .form-card { max-width: 440px; }
-
-    .field { margin-bottom: 14px; }
-
-    .field label {
-      display: block;
-      font-size: 12.5px;
-      font-weight: 500;
-      color: var(--text-2);
-      margin-bottom: 6px;
-    }
-
-    .field input {
-      width: 100%;
-      background: var(--surface);
-      border: 1px solid var(--line-2);
-      border-radius: var(--r-sm);
-      color: var(--text);
-      font-family: var(--font-sans);
-      font-size: 15.5px;
-      line-height: 1.4;
-      padding: 12px 13px;
-      transition: border-color 150ms var(--ease), background-color 150ms var(--ease);
-    }
-    .field input::placeholder { color: var(--text-3); }
-    .field input:hover { border-color: rgba(255, 255, 255, 0.24); }
-    .field input:focus { outline: none; border-color: var(--accent); background: var(--surface-2); }
-    .field input:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 2px; }
-    .field input:disabled { opacity: 0.55; }
-
+    /* ------------------------------------------------------------- buttons -- */
     .btn {
       position: relative;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      width: 100%;
-      min-height: 46px;
-      padding: 12px 20px;
-      border: 1px solid transparent;
-      border-radius: var(--r-sm);
+      min-height: 50px;
+      padding: 13px 24px;
+      border: 2px solid transparent;
+      border-radius: var(--r-ctl);
       font-family: var(--font-sans);
-      font-size: 15px;
-      font-weight: 550;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
       cursor: pointer;
       white-space: nowrap;
+      text-decoration: none;
       transition: background-color 150ms var(--ease), transform 90ms var(--ease), border-color 150ms var(--ease), color 150ms var(--ease);
     }
     .btn:active { transform: translateY(1px); }
-    .btn:disabled { cursor: default; opacity: 0.72; }
+    .btn:disabled { cursor: default; opacity: 0.6; }
 
-    /* Deep orchid, not the light one: white text has to be readable on it. */
-    .btn-primary { background: var(--accent-deep); color: #ffffff; }
-    .btn-primary:hover:not(:disabled) { background: #8d4799; }
+    .btn-primary { background: var(--violet); color: #ffffff; }
+    .btn-primary:hover:not(:disabled) { background: var(--violet-dark); }
 
-    .btn-quiet {
+    .btn-nav { min-height: 42px; padding: 9px 18px; font-size: 15px; }
+
+    .btn-outline {
       background: transparent;
-      color: var(--text);
+      color: var(--ink);
       border-color: var(--line-2);
-      width: auto;
-      min-height: 40px;
-      padding: 9px 16px;
-      font-size: 14px;
+      min-height: 44px;
+      padding: 10px 18px;
+      font-size: 15px;
     }
-    .btn-quiet:hover:not(:disabled) { border-color: var(--accent); background: rgba(199, 127, 196, 0.08); }
+    .btn-outline:hover:not(:disabled) { border-color: var(--ink); background: var(--paper-2); }
 
     .btn .label { transition: opacity 120ms linear; }
     .btn.loading .label { opacity: 0; }
     .btn .spinner {
       position: absolute;
-      width: 15px; height: 15px;
-      border: 2px solid rgba(255, 255, 255, 0.28);
+      width: 17px; height: 17px;
+      border: 2px solid rgba(255, 255, 255, 0.35);
       border-top-color: #ffffff;
       border-radius: 50%;
       opacity: 0;
       animation: spin 620ms linear infinite;
     }
-    .btn-quiet .spinner { border-color: rgba(244, 241, 248, 0.25); border-top-color: var(--text); }
+    .btn-outline .spinner { border-color: rgba(23, 18, 29, 0.2); border-top-color: var(--ink); }
     .btn.loading .spinner { opacity: 1; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    @media (prefers-reduced-motion: reduce) {
-      .btn .spinner { animation-duration: 1600ms; }
+    @media (prefers-reduced-motion: reduce) { .btn .spinner { animation-duration: 1600ms; } }
+
+    /* ------------------------------------------------------- background work --
+       The white sections were empty, which read as unfinished rather than
+       calm. Two devices, both flat:
+
+         .grid   faint graph paper, masked so it fades out at the edges
+                 instead of stopping at a hard line.
+         .float  small tiles carrying the things this product deals with,
+                 the three platforms and the two answers they give. Real
+                 marks, not abstract shapes.
+
+       Still no colour washes. The grid is a pattern and the tiles are
+       objects; neither is a glow. */
+    .has-deco { position: relative; overflow: hidden; }
+    .has-deco > .wrap { position: relative; z-index: 2; }
+
+    .grid {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(to right, rgba(23, 18, 29, 0.055) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(23, 18, 29, 0.055) 1px, transparent 1px);
+      background-size: 72px 72px;
+      background-position: center top;
+      -webkit-mask-image: radial-gradient(ellipse 78% 62% at 50% 38%, #000 35%, transparent 78%);
+      mask-image: radial-gradient(ellipse 78% 62% at 50% 38%, #000 35%, transparent 78%);
     }
 
+    /* Behind cards rather than behind open space, so it stays under them. */
+    .grid-soft {
+      background-size: 88px 88px;
+      -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 45%, #000 20%, transparent 74%);
+      mask-image: radial-gradient(ellipse 70% 70% at 50% 45%, #000 20%, transparent 74%);
+      opacity: 0.7;
+    }
+
+    .floats {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      display: none;
+    }
+    /* Only where there is real margin to put them in. Below this they would
+       crowd the headline, and a decoration that fights the copy loses. */
+    @media (min-width: 1040px) { .floats { display: block; } }
+
+    .float {
+      position: absolute;
+      width: 56px; height: 56px;
+      border-radius: 16px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-sm);
+      display: grid;
+      place-items: center;
+    }
+    .float svg { width: 25px; height: 25px; fill: var(--ink); opacity: 0.85; }
+    .float svg.is-x { width: 21px; height: 21px; }
+
+    .float.is-ok-tile { background: var(--panel-mint); border-color: #a8e3d3; }
+    .float.is-no-tile { background: var(--panel-blush); border-color: #f2bfb5; }
+    .float.is-ok-tile svg { stroke: var(--ok); fill: none; opacity: 1; }
+    .float.is-no-tile svg { stroke: var(--no); fill: none; opacity: 1; }
+
+    .float.t1 { left: 3%;  top: 16%;  transform: rotate(-8deg); }
+    .float.t2 { right: 4%; top: 11%;  transform: rotate(7deg); }
+    .float.t3 { right: 7%; top: 58%;  transform: rotate(-5deg); }
+    .float.t4 { left: 7%;  top: 62%;  transform: rotate(6deg); }
+    .float.t5 { left: 13%; top: 33%;  transform: rotate(3deg); width: 48px; height: 48px; }
+
+    /* Not a square: a timestamp, the third thing this product deals in
+       after the platform and its answer. */
+    .float.t6 {
+      right: 11%; top: 34%;
+      transform: rotate(-4deg);
+      width: auto; height: auto;
+      padding: 9px 13px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--ok);
+      background: var(--panel-mint);
+      border-color: #a8e3d3;
+      border-radius: 12px;
+    }
+
+    /* A slow drift, six seconds apart, so the page breathes without
+       performing. Off entirely for anyone who asked for less motion. */
+    @media (prefers-reduced-motion: no-preference) {
+      .float { animation: drift 7s ease-in-out infinite; }
+      .float.t2 { animation-delay: -1.4s; }
+      .float.t3 { animation-delay: -2.8s; }
+      .float.t4 { animation-delay: -4.2s; }
+      .float.t5 { animation-delay: -5.6s; }
+      .float.t6 { animation-delay: -3.5s; }
+      @keyframes drift {
+        0%, 100% { translate: 0 0; }
+        50%      { translate: 0 -9px; }
+      }
+    }
+
+    /* ----------------------------------------------------------------- hero -- */
+    .hero {
+      padding-top: 58px;
+      padding-bottom: 46px;
+      text-align: center;
+    }
+    @media (min-width: 900px) { .hero { padding-top: 92px; padding-bottom: 60px; } }
+
+    h1 {
+      font-size: clamp(42px, 7.6vw, 78px);
+      font-weight: 700;
+      letter-spacing: -0.042em;
+      line-height: 1.02;
+      max-width: 17ch;
+      margin: 0 auto 22px;
+      /* Stops the last word stranding itself on its own line. */
+      text-wrap: balance;
+    }
+
+    .hero-sub {
+      font-size: clamp(17px, 2.2vw, 21px);
+      line-height: 1.5;
+      color: var(--ink-2);
+      max-width: 44ch;
+      margin: 0 auto 34px;
+    }
+    .hero-sub strong { color: var(--ink); font-weight: 600; }
+
+    /* -------------------------------------------------------------- the form --
+       One field. The name is asked for afterwards, where it costs nothing. */
+    .signup { max-width: 470px; margin-inline: auto; }
+
+    .signup-row { display: grid; gap: 10px; }
+    @media (min-width: 540px) {
+      .signup-row { grid-template-columns: 1fr auto; }
+    }
+
+    .signup input {
+      width: 100%;
+      background: var(--paper);
+      border: 2px solid var(--line-2);
+      border-radius: var(--r-ctl);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-size: 16.5px;
+      line-height: 1.4;
+      padding: 13px 15px;
+      min-height: 50px;
+      transition: border-color 150ms var(--ease);
+    }
+    .signup input::placeholder { color: var(--ink-3); }
+    .signup input:hover { border-color: #b9aec4; }
+    .signup input:focus { outline: none; border-color: var(--violet); }
+    .signup input:focus-visible { outline: 3px solid var(--violet); outline-offset: 2px; }
+    .signup input:disabled { opacity: 0.6; }
+
     .form-note {
-      font-size: 12.5px;
-      color: var(--text-3);
+      font-size: 14px;
+      color: var(--ink-3);
       margin-top: 12px;
       line-height: 1.5;
     }
 
     .feedback {
-      font-size: 13.5px;
+      font-size: 14.5px;
       line-height: 1.5;
       margin-top: 10px;
-      color: var(--text-2);
+      color: var(--ink-2);
+      font-weight: 500;
     }
     .feedback:empty { margin-top: 0; }
-    .feedback.error { color: var(--refused); }
+    .feedback.error { color: var(--no); }
 
-    /* ------------------------------------------------------------ the record --
-       Not a screenshot of an app that is not public yet. A record: what the
-       three platforms said about one post, in the platforms' own voice. */
+    /* ---------------------------------------------------------- works with -- */
+    .works {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 14px 26px;
+      margin-top: 44px;
+    }
+    .works-label {
+      font-size: 14px;
+      color: var(--ink-3);
+      font-weight: 500;
+    }
+    .works-logos { display: flex; align-items: center; gap: 24px; }
+    .works-logos svg {
+      width: 25px; height: 25px;
+      display: block;
+      fill: var(--ink);
+      opacity: 0.82;
+    }
+    .works-logos svg.is-x { width: 21px; height: 21px; }
+
+    /* -------------------------------------------------------- the record band --
+       A flat mint panel with one white card on it. The card is a record of
+       what three platforms said, not a mock of an app that is not public. */
+    .band { padding-block: 54px; }
+    @media (min-width: 900px) { .band { padding-block: 76px; } }
+
+    .band-mint { background: var(--panel-mint); }
+    .band-paper2 { background: var(--paper-2); }
+
     .record {
-      background: var(--surface);
-      border: 1px solid var(--line-2);
-      border-radius: var(--r-md);
+      background: var(--paper);
+      border-radius: var(--r-panel);
+      box-shadow: var(--shadow);
+      max-width: 640px;
+      margin-inline: auto;
       overflow: hidden;
     }
 
@@ -393,77 +476,76 @@
       align-items: baseline;
       justify-content: space-between;
       gap: 12px;
-      padding: 14px 16px;
+      padding: 17px 22px;
       border-bottom: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.015);
     }
     .record-title {
-      font-size: 13.5px;
-      font-weight: 500;
-      color: var(--text);
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.015em;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
     .record-meta {
       font-family: var(--font-mono);
-      font-size: 11.5px;
-      color: var(--text-3);
+      font-size: 12.5px;
+      color: var(--ink-3);
       white-space: nowrap;
     }
 
-    .record-rows { padding: 4px 0; }
-
     .row {
       display: grid;
-      grid-template-columns: 74px 1fr auto;
-      align-items: baseline;
-      gap: 12px;
-      padding: 11px 16px;
+      grid-template-columns: 86px 1fr auto;
+      align-items: center;
+      gap: 14px;
+      padding: 15px 22px;
     }
     .row + .row { border-top: 1px solid var(--line); }
 
-    .row-dest {
-      font-size: 13.5px;
-      font-weight: 500;
-      color: var(--text-2);
-    }
+    .row-dest { font-size: 15.5px; font-weight: 600; letter-spacing: -0.01em; }
 
     .row-state {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
       font-family: var(--font-mono);
-      font-size: 13px;
-      color: var(--text-3);
+      font-size: 14px;
+      font-weight: 500;
     }
-    .row-state.is-confirmed { color: var(--confirmed); }
-    .row-state.is-refused { color: var(--refused); }
+    .row-state svg { width: 15px; height: 15px; flex: none; }
+    .is-ok { color: var(--ok); }
+    .is-no { color: var(--no); }
 
     .row-time {
       font-family: var(--font-mono);
-      font-size: 11.5px;
-      color: var(--text-3);
+      font-size: 12.5px;
+      color: var(--ink-3);
       font-variant-numeric: tabular-nums;
     }
 
     .row-reason {
       grid-column: 2 / -1;
       font-family: var(--font-mono);
-      font-size: 12px;
+      font-size: 13px;
       line-height: 1.5;
-      color: var(--text-2);
-      margin-top: 5px;
+      color: var(--no);
+      margin-top: 7px;
     }
+    .row.has-reason { align-items: start; }
 
-    .record-foot {
-      padding: 12px 16px 14px;
-      border-top: 1px solid var(--line);
-      font-size: 12.5px;
+    .band-note {
+      text-align: center;
+      font-size: 14.5px;
+      color: #2c6a5d;
+      margin-top: 20px;
+      max-width: 52ch;
+      margin-inline: auto;
       line-height: 1.55;
-      color: var(--text-3);
     }
 
     /* The rows resolve one after another, because that is what actually
-       happens: confirmations come back at different times. Motion with a
-       job. It runs once and stops. */
+       happens: each platform answers at its own pace. Runs once, then stops. */
     @media (prefers-reduced-motion: no-preference) {
       .js .record .row-state,
       .js .record .row-time,
@@ -475,214 +557,224 @@
         animation-delay: var(--d, 0ms);
       }
       @keyframes settle {
-        from { opacity: 0; transform: translateY(3px); }
-        to   { opacity: 1; transform: translateY(0); }
+        from { opacity: 0; transform: translateY(4px); }
+        to   { opacity: 1; transform: none; }
       }
     }
 
-    /* ------------------------------------------------------------ the claim --
-       Centred and alone, because it is one sentence and it is the argument. */
-    .claim {
-      border-top: 1px solid var(--line);
-      padding-block: 76px;
-      text-align: center;
+    /* ---------------------------------------------------------- the scene --
+       A solid butter panel. The story beat, and the loudest type on the page
+       after the headline. */
+    .scene {
+      background: var(--panel-butter);
+      padding-block: 68px;
     }
-    @media (min-width: 900px) { .claim { padding-block: 108px; } }
+    @media (min-width: 900px) { .scene { padding-block: 104px; } }
 
-    /* Each sentence owns its own line so the rag is ours, not the
-       browser's. They still wrap on a narrow screen, which is fine. */
-    .claim p.big {
-      font-size: clamp(25px, 4.1vw, 40px);
+    /* Each sentence owns its line. The beat between them is the point. */
+    .scene p.big {
+      font-size: clamp(29px, 4.3vw, 48px);
+      font-weight: 700;
+      letter-spacing: -0.038em;
+      line-height: 1.1;
+      /* No ch cap: the second sentence is the longer one and should get a
+         line of its own rather than dropping a single word underneath. */
+      max-width: none;
+    }
+    .scene p.big span { display: block; }
+    .scene .muted { color: #7d5f0c; }
+
+    .scene-body {
+      margin-top: 26px;
+      font-size: clamp(16.5px, 2vw, 19px);
+      line-height: 1.6;
+      color: #5c4a14;
+      max-width: 50ch;
       font-weight: 500;
-      letter-spacing: -0.032em;
-      line-height: 1.24;
-      max-width: 22ch;
-      margin-inline: auto;
-    }
-    .claim p.big span { display: block; }
-    .claim .quiet { color: var(--text-3); }
-
-    .claim-body {
-      margin-top: 24px;
-      font-size: 16px;
-      line-height: 1.65;
-      color: var(--text-2);
-      max-width: 54ch;
-      margin-inline: auto;
     }
 
-    /* --------------------------------------------------------- capabilities --
-       Rows, not cards. Each is a claim in our voice with the platform's
-       answer underneath it, which is the whole design idea in miniature. */
-    .does { border-top: 1px solid var(--line); padding-block: 64px; }
-    @media (min-width: 900px) { .does { padding-block: 88px; } }
+    /* ------------------------------------------------------------- features --
+       A bento with rhythm: one wide card, then two. Every card carries a
+       solid panel with a real artifact in it, never a fake screenshot. */
+    .does { padding-block: 62px; }
+    @media (min-width: 900px) { .does { padding-block: 92px; } }
 
     .section-head {
-      font-size: clamp(23px, 3.3vw, 31px);
+      font-size: clamp(30px, 4.6vw, 46px);
+      font-weight: 700;
+      letter-spacing: -0.038em;
+      line-height: 1.08;
+      margin-bottom: 36px;
+      max-width: 18ch;
+    }
+
+    .cards { display: grid; gap: 18px; }
+    @media (min-width: 860px) {
+      .cards { grid-template-columns: 1fr 1fr; }
+      .card.wide { grid-column: 1 / -1; }
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--r-panel);
+      overflow: hidden;
+      background: var(--paper);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-art {
+      padding: 26px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 168px;
+    }
+    .art-violet { background: var(--panel-violet); }
+    .art-butter { background: var(--panel-butter); }
+    .art-blush  { background: var(--panel-blush); }
+
+    .card-body { padding: 22px; }
+    .card h3 {
+      font-size: clamp(20px, 2.5vw, 24px);
+      font-weight: 650;
+      letter-spacing: -0.024em;
+      line-height: 1.2;
+      margin-bottom: 9px;
+    }
+    .card p {
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--ink-2);
+      max-width: 54ch;
+    }
+
+    @media (min-width: 860px) {
+      .card.wide { flex-direction: row; align-items: stretch; }
+      .card.wide .card-art { flex: 0 0 52%; min-height: 220px; }
+      .card.wide .card-body { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 34px; }
+    }
+
+    /* The little artifacts that sit on the panels */
+    .chit {
+      background: var(--paper);
+      border-radius: 14px;
+      box-shadow: var(--shadow-sm);
+      padding: 16px 18px;
+      width: 100%;
+      max-width: 340px;
+    }
+    .chit + .chit { margin-top: 10px; }
+
+    .chit-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+    }
+    .chit-line + .chit-line { margin-top: 9px; padding-top: 9px; border-top: 1px solid var(--line); }
+    .chit-who { font-family: var(--font-sans); font-weight: 600; font-size: 14.5px; }
+    .chit-say { display: inline-flex; align-items: center; gap: 6px; }
+    .chit-say svg { width: 14px; height: 14px; flex: none; }
+
+    .chit-label {
+      font-family: var(--font-sans);
+      font-size: 12.5px;
       font-weight: 600;
-      letter-spacing: -0.028em;
-      line-height: 1.18;
-      max-width: 20ch;
-      margin-bottom: 40px;
+      color: var(--ink-3);
+      margin-bottom: 9px;
     }
 
-    .does-item {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-      padding-block: 26px;
-      border-top: 1px solid var(--line);
+    .fanout {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 4px;
     }
-    .does-item:first-child { border-top: 0; padding-top: 0; }
-    @media (min-width: 820px) {
-      .does-item {
-        grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-        gap: 40px;
-        align-items: start;
-        padding-block: 30px;
-      }
-    }
+    .fanout svg { width: 22px; height: 22px; fill: var(--ink); opacity: 0.8; }
+    .fanout svg.is-x { width: 18px; height: 18px; }
+    .fanout .arrow { color: var(--ink-3); font-family: var(--font-mono); font-size: 15px; }
 
-    .does-claim {
-      font-size: clamp(18px, 2.4vw, 21px);
-      font-weight: 550;
-      letter-spacing: -0.02em;
-      line-height: 1.32;
+    /* --------------------------------------------------------------- belief --
+       Full bleed violet. The page says what it stands for, once, loudly. */
+    .belief {
+      background: var(--violet);
+      color: #ffffff;
+      padding-block: 70px;
     }
+    @media (min-width: 900px) { .belief { padding-block: 108px; } }
 
-    .does-detail {
-      font-size: 15px;
+    .belief h2 {
+      font-size: clamp(30px, 5vw, 52px);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.08;
+      max-width: 17ch;
+      margin-bottom: 24px;
+    }
+    .belief p {
+      font-size: clamp(16.5px, 2vw, 19px);
       line-height: 1.62;
-      color: var(--text-2);
+      color: rgba(255, 255, 255, 0.88);
       max-width: 52ch;
     }
-
-    .does-echo {
-      display: block;
-      font-family: var(--font-mono);
-      font-size: 12.5px;
-      line-height: 1.55;
-      color: var(--text-3);
-      margin-top: 10px;
-      padding-left: 13px;
-      border-left: 2px solid var(--accent-deep);
-    }
-    .does-echo .ok { color: var(--confirmed); }
-    .does-echo .no { color: var(--refused); }
-
-    /* ---------------------------------------------------------- the honesty --
-       Two columns. The right one is the reason anybody should believe the
-       left one. */
-    .honest { border-top: 1px solid var(--line); padding-block: 64px; }
-    @media (min-width: 900px) { .honest { padding-block: 88px; } }
-
-    .honest-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 36px;
-    }
-    @media (min-width: 760px) {
-      .honest-grid { grid-template-columns: 1fr 1fr; gap: 56px; }
-    }
-
-    .col-title {
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-    .col-note {
-      font-size: 13px;
-      color: var(--text-3);
-      margin-bottom: 18px;
-      line-height: 1.5;
-    }
-
-    .col ul { list-style: none; }
-    .col li {
-      font-size: 15px;
-      line-height: 1.55;
-      padding-block: 9px;
-      border-top: 1px solid var(--line);
-      color: var(--text-2);
-    }
-    .col li strong { color: var(--text); font-weight: 500; }
-    .col li span {
-      display: block;
-      font-size: 13px;
-      color: var(--text-3);
-      margin-top: 2px;
-    }
-
-    .honest-foot {
-      margin-top: 40px;
-      padding-top: 24px;
-      border-top: 1px solid var(--line);
-      font-size: 15px;
-      line-height: 1.65;
-      color: var(--text-2);
-      max-width: 62ch;
-    }
-    .honest-foot strong { color: var(--text); font-weight: 500; }
+    .belief p + p { margin-top: 15px; }
+    .belief strong { color: #ffffff; font-weight: 600; }
 
     /* ------------------------------------------------------------------ ask -- */
-    .ask {
-      border-top: 1px solid var(--line);
-      padding-block: 72px;
-      position: relative;
-      overflow: hidden;
-    }
-    @media (min-width: 900px) { .ask { padding-block: 100px; } }
-
-    .ask::before {
-      content: '';
-      position: absolute;
-      left: 50%; bottom: -320px;
-      transform: translateX(-50%);
-      width: 820px; height: 480px;
-      background: radial-gradient(circle, rgba(123, 60, 133, 0.22), transparent 68%);
-      pointer-events: none;
-    }
-
-    .ask-inner { position: relative; z-index: 1; }
+    .ask { padding-block: 70px; text-align: center; }
+    @media (min-width: 900px) { .ask { padding-block: 104px; } }
 
     .ask h2 {
-      font-size: clamp(25px, 4vw, 38px);
-      font-weight: 600;
-      letter-spacing: -0.03em;
-      line-height: 1.15;
-      margin-bottom: 14px;
-      max-width: 17ch;
+      font-size: clamp(30px, 4.8vw, 50px);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.08;
+      margin: 0 auto 18px;
+      max-width: 16ch;
     }
     .ask-lede {
-      font-size: 16px;
-      line-height: 1.65;
-      color: var(--text-2);
-      max-width: 48ch;
-      margin-bottom: 30px;
+      font-size: clamp(16.5px, 2vw, 19px);
+      line-height: 1.6;
+      color: var(--ink-2);
+      max-width: 46ch;
+      margin: 0 auto 32px;
     }
 
     /* ------------------------------------------------------- after they join --
-       The two questions the waitlist exists to answer. They only appear
-       once the email is safe, so they cost nothing if ignored. */
-    .joined { display: none; }
+       The two questions the waitlist exists to answer. They appear only once
+       the email is safe, so they cost nothing if ignored. */
+    .joined { display: none; text-align: left; }
     .joined[data-open="true"] { display: block; }
+
+    .joined-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--r-panel);
+      padding: 24px;
+      max-width: 560px;
+      margin-inline: auto;
+    }
+    .band-mint .joined-card, .ask .joined-card { box-shadow: var(--shadow-sm); }
 
     .joined-head {
       display: flex;
       align-items: center;
-      gap: 9px;
-      font-size: 16px;
-      font-weight: 550;
-      letter-spacing: -0.015em;
-      margin-bottom: 6px;
+      gap: 10px;
+      font-size: 19px;
+      font-weight: 650;
+      letter-spacing: -0.022em;
+      margin-bottom: 7px;
     }
-    .joined-head .tick { color: var(--confirmed); flex: none; }
+    .joined-head svg { color: var(--ok); flex: none; }
     .joined-note {
-      font-size: 14px;
-      color: var(--text-2);
+      font-size: 15.5px;
+      color: var(--ink-2);
       line-height: 1.6;
-      margin-bottom: 24px;
-      max-width: 46ch;
+      margin-bottom: 22px;
     }
 
     .step { border-top: 1px solid var(--line); padding-top: 20px; margin-top: 20px; }
@@ -690,32 +782,48 @@
 
     .step-q {
       display: block;
-      font-size: 14px;
-      font-weight: 500;
+      font-size: 15.5px;
+      font-weight: 600;
       margin-bottom: 12px;
-      line-height: 1.5;
+      line-height: 1.45;
+      letter-spacing: -0.012em;
     }
+
+    .named {
+      width: 100%;
+      border: 2px solid var(--line-2);
+      border-radius: var(--r-ctl);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      padding: 11px 14px;
+      color: var(--ink);
+      margin-bottom: 16px;
+      background: var(--paper);
+    }
+    .named::placeholder { color: var(--ink-3); }
+    .named:focus { outline: none; border-color: var(--violet); }
 
     /* Segmented, sharing borders. Not chips. */
     .roles {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      border: 1px solid var(--line-2);
-      border-radius: var(--r-sm);
+      border: 2px solid var(--line-2);
+      border-radius: var(--r-ctl);
       overflow: hidden;
     }
     @media (min-width: 560px) { .roles { grid-template-columns: repeat(4, 1fr); } }
 
     .role {
       appearance: none;
-      background: transparent;
+      background: var(--paper);
       border: 0;
       border-right: 1px solid var(--line-2);
       border-bottom: 1px solid var(--line-2);
-      color: var(--text-2);
+      color: var(--ink-2);
       font-family: var(--font-sans);
-      font-size: 13.5px;
-      padding: 11px 8px;
+      font-size: 14.5px;
+      font-weight: 500;
+      padding: 12px 8px;
       cursor: pointer;
       transition: background-color 140ms var(--ease), color 140ms var(--ease);
     }
@@ -725,34 +833,33 @@
       .role { border-bottom: 0; border-right: 1px solid var(--line-2); }
       .role:last-child { border-right: 0; }
     }
-    .role:hover { background: rgba(255, 255, 255, 0.04); color: var(--text); }
-    .role[aria-pressed="true"] { background: var(--accent-deep); color: #ffffff; }
+    .role:hover { background: var(--paper-2); color: var(--ink); }
+    .role[aria-pressed="true"] { background: var(--violet); color: #ffffff; }
 
     .ta {
       width: 100%;
-      background: var(--surface);
-      border: 1px solid var(--line-2);
-      border-radius: var(--r-sm);
-      color: var(--text);
+      background: var(--paper);
+      border: 2px solid var(--line-2);
+      border-radius: var(--r-ctl);
+      color: var(--ink);
       font-family: var(--font-sans);
-      font-size: 14.5px;
+      font-size: 15.5px;
       line-height: 1.55;
-      padding: 10px 12px;
+      padding: 11px 14px;
       resize: vertical;
-      min-height: 62px;
+      min-height: 68px;
     }
-    .ta::placeholder { color: var(--text-3); }
-    .ta:focus { outline: none; border-color: var(--accent); background: var(--surface-2); }
-    .ta:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 2px; }
-    .ta:disabled { opacity: 0.55; }
+    .ta::placeholder { color: var(--ink-3); }
+    .ta:focus { outline: none; border-color: var(--violet); }
+    .ta:disabled { opacity: 0.6; }
 
-    .q-gap { margin-top: 14px; }
-    .step-actions { margin-top: 12px; }
+    .q-gap { margin-top: 16px; }
+    .step-actions { margin-top: 14px; }
 
     /* --------------------------------------------------------------- footer -- */
     .foot {
       border-top: 1px solid var(--line);
-      padding-block: 30px 40px;
+      padding-block: 28px 40px;
     }
     .foot-inner {
       display: flex;
@@ -760,20 +867,20 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      font-size: 13px;
-      color: var(--text-3);
+      font-size: 14.5px;
+      color: var(--ink-3);
     }
-    .foot a { color: var(--text-3); text-decoration: none; }
-    .foot a:hover { color: var(--text-2); text-decoration: underline; }
+    .foot a { color: var(--ink-2); text-decoration: none; font-weight: 500; }
+    .foot a:hover { color: var(--ink); text-decoration: underline; }
 
     /* ------------------------------------------------------- scroll reveal --
        IntersectionObserver, never a scroll listener. */
     @media (prefers-reduced-motion: no-preference) {
-      .js .reveal { opacity: 0; transform: translateY(14px); }
+      .js .reveal { opacity: 0; transform: translateY(16px); }
       .js .reveal.seen {
         opacity: 1;
         transform: none;
-        transition: opacity 600ms var(--ease), transform 600ms var(--ease);
+        transition: opacity 620ms var(--ease), transform 620ms var(--ease);
       }
     }
   </style>
@@ -784,261 +891,298 @@
   <header class="nav">
     <div class="nav-inner">
       <a class="brand" href="/" aria-label="Zoxia, home">
-        <!-- The existing Zoxia mark, in the palette rather than the old orange. -->
         <svg viewBox="0 0 512 512" fill="none" aria-hidden="true" focusable="false">
           <path d="M 96 112 L 416 112 L 416 176 L 240 176 L 368 336 L 416 336 L 416 400 L 96 400 L 96 336 L 272 336 L 144 176 L 96 176 Z" fill="currentColor"/>
         </svg>
         <span class="brand-name">Zoxia</span>
       </a>
-      <a class="nav-cta" href="#join">Join the waitlist</a>
+      <a class="btn btn-primary btn-nav" href="#join">Join the waitlist</a>
     </div>
   </header>
 
   <main>
     <!-- ================================================================ hero -->
-    <section class="hero">
-      <div class="wrap hero-grid">
-        <div>
-          <h1>Your posts actually go out.</h1>
-          <p class="hero-sub">
-            Zoxia posts to TikTok, X and LinkedIn, then asks each one whether it
-            published. <strong>When one refuses, you hear it from us.</strong>
-          </p>
+    <section class="hero has-deco">
+      <div class="grid" aria-hidden="true"></div>
+      <div class="floats" aria-hidden="true">
+        <span class="float t1"><svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></span>
+        <span class="float t2 is-ok-tile"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.6 4.6L19 7.4" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="float t3"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></span>
+        <span class="float t4 is-no-tile"><svg viewBox="0 0 24 24" fill="none"><path d="M7 7l10 10M17 7L7 17" stroke-width="2.6" stroke-linecap="round"/></svg></span>
+        <span class="float t5"><svg viewBox="0 0 24 24" class="is-x"><path d="M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z"/></svg></span>
+        <span class="float t6">11:04</span>
+      </div>
+      <div class="wrap">
+        <h1>Your posts actually go out.</h1>
+        <p class="hero-sub">
+          Zoxia posts to TikTok, X and LinkedIn, then asks each one whether it
+          published. <strong>When one refuses, you hear it from us.</strong>
+        </p>
 
-          <div class="form-card" id="join">
-            <form id="form-top" novalidate>
-              <div class="field">
-                <label for="name-top">Your name</label>
-                <input type="text" id="name-top" name="name" autocomplete="name" placeholder="Optional">
-              </div>
-              <div class="field">
-                <label for="email-top">Email address</label>
-                <input type="email" id="email-top" name="email" autocomplete="email" required placeholder="you@example.com">
-              </div>
+        <div class="signup" id="join">
+          <form id="form-top" novalidate>
+            <div class="signup-row">
+              <label class="sr-only" for="email-top">Email address</label>
+              <input type="email" id="email-top" name="email" autocomplete="email" required placeholder="you@example.com">
               <button type="submit" class="btn btn-primary">
                 <span class="label">Join the waitlist</span>
                 <span class="spinner" aria-hidden="true"></span>
               </button>
-              <p class="feedback" id="feedback-top" role="alert" aria-live="polite"></p>
-              <p class="form-note">One email when it opens. Nothing else, and no card.</p>
-            </form>
-
-            <div class="joined" id="joined-top">
-              <p class="joined-head">
-                <svg class="tick" width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                  <path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                You are on the list.
-              </p>
-              <p class="joined-note">
-                We will email you when Zoxia opens. If you have a minute, two questions
-                would genuinely shape what we build.
-              </p>
-
-              <div class="step">
-                <p class="step-q" id="role-q">What do you do?</p>
-                <div class="roles" role="group" aria-labelledby="role-q">
-                  <button type="button" class="role" data-role="Creator" aria-pressed="false">Creator</button>
-                  <button type="button" class="role" data-role="Social media manager" aria-pressed="false">Manager</button>
-                  <button type="button" class="role" data-role="Business" aria-pressed="false">Business</button>
-                  <button type="button" class="role" data-role="Other" aria-pressed="false">Other</button>
-                </div>
-                <p class="feedback" id="role-feedback" role="status" aria-live="polite"></p>
-              </div>
-
-              <div class="step">
-                <label class="step-q" for="q-lost">Have you ever had a scheduled post fail without knowing?</label>
-                <textarea class="ta" id="q-lost" rows="2" placeholder="What happened, and how did you find out?"></textarea>
-
-                <label class="step-q q-gap" for="q-proof">What do you send a brand when they ask for your numbers?</label>
-                <textarea class="ta" id="q-proof" rows="2" placeholder="Screenshots, a media kit, or something else?"></textarea>
-
-                <div class="step-actions">
-                  <button type="button" class="btn btn-quiet" id="answers-btn">
-                    <span class="label">Send answers</span>
-                    <span class="spinner" aria-hidden="true"></span>
-                  </button>
-                </div>
-                <p class="feedback" id="answers-feedback" role="alert" aria-live="polite"></p>
-              </div>
             </div>
-          </div>
+            <p class="feedback" id="feedback-top" role="alert" aria-live="polite"></p>
+            <p class="form-note">One email, on the day it opens. No card, ever.</p>
+          </form>
         </div>
 
+        <div class="works">
+          <span class="works-label">Posts to</span>
+          <span class="works-logos">
+            <svg viewBox="0 0 24 24" role="img" aria-label="TikTok"><title>TikTok</title><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+            <svg viewBox="0 0 24 24" role="img" aria-label="X" class="is-x"><title>X</title><path d="M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z"/></svg>
+            <svg viewBox="0 0 24 24" role="img" aria-label="LinkedIn"><title>LinkedIn</title><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= the record -->
+    <section class="band band-mint">
+      <div class="wrap">
         <!--
-          The record. One post, three destinations, three answers.
-          Deliberately not a mock of the app: the app is not public, and a
-          fake screenshot of it would be the exact thing this product is
-          against.
+          One post, three destinations, three answers. Deliberately not a
+          mock of the app: the app is not public, and faking a screenshot of
+          it is the exact thing this product exists to argue against.
         -->
         <figure class="record" id="record">
           <div class="record-head">
             <span class="record-title">Rainy season skincare routine</span>
             <span class="record-meta">scheduled 11:00</span>
           </div>
-          <div class="record-rows">
-            <div class="row">
-              <span class="row-dest">TikTok</span>
-              <span class="row-state is-confirmed" style="--d:120ms">confirmed</span>
-              <span class="row-time" style="--d:120ms">11:04</span>
-            </div>
-            <div class="row">
-              <span class="row-dest">LinkedIn</span>
-              <span class="row-state is-confirmed" style="--d:520ms">confirmed</span>
-              <span class="row-time" style="--d:520ms">11:06</span>
-            </div>
-            <div class="row">
-              <span class="row-dest">X</span>
-              <span class="row-state is-refused" style="--d:980ms">refused</span>
-              <span class="row-time" style="--d:980ms">11:06</span>
-              <span class="row-reason" style="--d:1180ms">Duplicate content. X rejects a post identical to one from the last 24 hours.</span>
-            </div>
+
+          <div class="row">
+            <span class="row-dest">TikTok</span>
+            <span class="row-state is-ok" style="--d:140ms">
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 5" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              confirmed
+            </span>
+            <span class="row-time" style="--d:140ms">11:04</span>
           </div>
-          <figcaption class="record-foot">
-            An example. Every destination is checked with the platform itself, so two
-            can succeed while the third tells you exactly what went wrong.
-          </figcaption>
+
+          <div class="row">
+            <span class="row-dest">LinkedIn</span>
+            <span class="row-state is-ok" style="--d:560ms">
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 5" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              confirmed
+            </span>
+            <span class="row-time" style="--d:560ms">11:06</span>
+          </div>
+
+          <div class="row has-reason">
+            <span class="row-dest">X</span>
+            <span class="row-state is-no" style="--d:1000ms">
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg>
+              refused
+            </span>
+            <span class="row-time" style="--d:1000ms">11:06</span>
+            <span class="row-reason" style="--d:1220ms">Duplicate content. X rejects a post identical to one from the last 24 hours.</span>
+          </div>
         </figure>
+
+        <p class="band-note">
+          An example. Two went out, one did not, and you did not have to open three
+          apps to find out.
+        </p>
       </div>
     </section>
 
-    <!-- =============================================================== claim -->
-    <section class="claim">
+    <!-- ========================================================== the scene -->
+    <section class="scene">
       <div class="wrap">
         <p class="big reveal">
-          <span>Every scheduler says it posted.</span>
-          <span class="quiet">Most only know that they sent it.</span>
+          <span>You scheduled it on Sunday.</span>
+          <span class="muted">The client asks about it on Thursday.</span>
         </p>
-        <p class="claim-body reveal">
-          Handing a post to a platform and having a platform publish it are two
-          different events. Between them sit expired connections, duplicate rules,
-          copyright holds and region blocks. If nobody checks, the calendar says it
-          went out and the account says otherwise, and you find out when a client asks.
+        <p class="scene-body reveal">
+          It was never posted. Your calendar said it went out, the platform refused it
+          quietly, and nothing in between thought to mention it. Sending is not
+          publishing, and most tools only ever know that they sent it.
         </p>
       </div>
     </section>
 
-    <!-- ================================================================ does -->
-    <section class="does">
+    <!-- ======================================================== what it does -->
+    <section class="does has-deco">
+      <div class="grid grid-soft" aria-hidden="true"></div>
       <div class="wrap">
-        <h2 class="section-head reveal">What Zoxia does today</h2>
+        <h2 class="section-head reveal">So we ask.</h2>
 
-        <div class="does-item reveal">
-          <p class="does-claim">One post, three platforms, one upload.</p>
-          <div>
-            <p class="does-detail">
-              Write it once and send it to TikTok, X and LinkedIn together. The video
-              uploads a single time, not once per destination.
-            </p>
-          </div>
-        </div>
+        <div class="cards">
+          <article class="card wide reveal">
+            <div class="card-art art-violet">
+              <div>
+                <div class="chit">
+                  <p class="chit-label">Most schedulers</p>
+                  <div class="chit-line">
+                    <span class="chit-who">Your post</span>
+                    <span class="chit-say">sent</span>
+                  </div>
+                </div>
+                <div class="chit">
+                  <p class="chit-label">Zoxia</p>
+                  <div class="chit-line">
+                    <span class="chit-who">Your post</span>
+                    <span class="chit-say is-ok">
+                      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 5" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      published, confirmed by TikTok
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <h3>Confirmed, or explained.</h3>
+              <p>
+                After every post, Zoxia goes back to each platform and asks what happened
+                to it. Nothing is marked published on our word. It is marked published
+                when the platform says so, and when one refuses you get the destination
+                and the reason, in words you can act on.
+              </p>
+            </div>
+          </article>
 
-        <div class="does-item reveal">
-          <p class="does-claim">Each destination confirmed separately.</p>
-          <div>
-            <p class="does-detail">
-              After a post is sent, Zoxia goes back to the platform and asks what
-              happened to it. A post is only marked published when the platform says
-              so, and a refusal names the destination and the reason.
-            </p>
-            <span class="does-echo">
-              TikTok <span class="ok">confirmed</span>, LinkedIn <span class="ok">confirmed</span>, X <span class="no">refused</span>
-            </span>
-          </div>
-        </div>
+          <article class="card reveal">
+            <div class="card-art art-butter">
+              <div class="chit">
+                <p class="chit-label">One upload</p>
+                <div class="fanout">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+                  <svg viewBox="0 0 24 24" class="is-x" aria-hidden="true"><path d="M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z"/></svg>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <h3>One post, every platform.</h3>
+              <p>
+                Write it once and send it to all three together. The video uploads a
+                single time, not once per destination, which on Nigerian data is the
+                difference between a minute and ten.
+              </p>
+            </div>
+          </article>
 
-        <div class="does-item reveal">
-          <p class="does-claim">A warning before a connection dies.</p>
-          <div>
-            <p class="does-detail">
-              LinkedIn drops your connection every 60 days and will not renew it on its
-              own. Zoxia warns you three times before it goes, so a week of scheduled
-              posts does not quietly stop.
-            </p>
-            <span class="does-echo">
-              reconnect LinkedIn: 48 hours, 24 hours, 6 hours
-            </span>
-          </div>
+          <article class="card reveal">
+            <div class="card-art art-blush">
+              <div class="chit">
+                <p class="chit-label">Before it expires</p>
+                <div class="chit-line"><span class="chit-who">Reconnect LinkedIn</span><span class="chit-say">48 hours</span></div>
+                <div class="chit-line"><span class="chit-who">Reconnect LinkedIn</span><span class="chit-say">24 hours</span></div>
+                <div class="chit-line"><span class="chit-who">Reconnect LinkedIn</span><span class="chit-say">6 hours</span></div>
+              </div>
+            </div>
+            <div class="card-body">
+              <h3>Warned before it breaks.</h3>
+              <p>
+                LinkedIn drops your connection every 60 days and will not renew it on its
+                own. Zoxia tells you three times before it goes, so a week of scheduled
+                posts never quietly stops.
+              </p>
+            </div>
+          </article>
         </div>
       </div>
     </section>
 
-    <!-- ============================================================== honest -->
-    <section class="honest">
+    <!-- ============================================================== belief -->
+    <section class="belief">
       <div class="wrap">
-        <h2 class="section-head reveal">What is not ready</h2>
-
-        <div class="honest-grid reveal">
-          <div class="col">
-            <p class="col-title">Working</p>
-            <p class="col-note">Built and running today.</p>
-            <ul>
-              <li><strong>TikTok, X and LinkedIn</strong></li>
-              <li><strong>Publish confirmation</strong> <span>Per destination, from the platform</span></li>
-              <li><strong>Failure reasons in plain words</strong></li>
-              <li><strong>Expiry warnings</strong> <span>Three, before a connection dies</span></li>
-              <li><strong>Payment in naira</strong> <span>A card that works here</span></li>
-            </ul>
-          </div>
-
-          <div class="col">
-            <p class="col-title">Not yet</p>
-            <p class="col-note">Real gaps, listed because you would find them anyway.</p>
-            <ul>
-              <li><strong>Instagram and Facebook</strong> <span>Blocked on an approval we do not control</span></li>
-              <li><strong>Reports you can send a brand</strong> <span>Designed, not built</span></li>
-              <li><strong>Team accounts</strong> <span>One person per account for now</span></li>
-              <li><strong>A launch date</strong> <span>Gated on a platform review, so we will not invent one</span></li>
-            </ul>
-          </div>
-        </div>
-
-        <p class="honest-foot reveal">
-          <strong>We would rather lose you here than at the payment screen.</strong>
-          A tool that tells you when a post failed has no business overstating what it
-          can do on its own landing page.
+        <h2 class="reveal">We only tell you what the platform told us.</h2>
+        <p class="reveal">
+          If a platform will not say whether something went out, Zoxia says that,
+          rather than guessing in your favour. A number we cannot stand behind stays
+          blank instead of being filled in.
+        </p>
+        <p class="reveal">
+          <strong>It is an odd thing to build a product on.</strong> It is also the only
+          reason a status from us is worth more than a green tick from anyone else.
         </p>
       </div>
     </section>
 
     <!-- ================================================================= ask -->
-    <section class="ask">
-      <div class="wrap ask-inner">
-        <h2 class="reveal">Zoxia is not open yet.</h2>
+    <section class="ask has-deco">
+      <div class="grid" aria-hidden="true"></div>
+      <div class="floats" aria-hidden="true">
+        <span class="float t1"><svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></span>
+        <span class="float t2 is-ok-tile"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.6 4.6L19 7.4" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="float t3"><svg viewBox="0 0 24 24" class="is-x"><path d="M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z"/></svg></span>
+        <span class="float t4"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></span>
+      </div>
+      <div class="wrap">
+        <h2 class="reveal">Be there when it opens.</h2>
         <p class="ask-lede reveal">
-          We are building it with a first group of creators and managers in Nigeria.
-          Join and you will hear from us once, when it opens.
+          Zoxia is being built with a first group of creators and social media managers
+          in Nigeria. Join them, and you will hear from us once, on the day it opens.
         </p>
 
-        <div class="form-card reveal">
+        <div class="signup reveal">
           <form id="form-bottom" novalidate>
-            <div class="field">
-              <label for="name-bottom">Your name</label>
-              <input type="text" id="name-bottom" name="name" autocomplete="name" placeholder="Optional">
-            </div>
-            <div class="field">
-              <label for="email-bottom">Email address</label>
+            <div class="signup-row">
+              <label class="sr-only" for="email-bottom">Email address</label>
               <input type="email" id="email-bottom" name="email" autocomplete="email" required placeholder="you@example.com">
+              <button type="submit" class="btn btn-primary">
+                <span class="label">Join the waitlist</span>
+                <span class="spinner" aria-hidden="true"></span>
+              </button>
             </div>
-            <button type="submit" class="btn btn-primary">
-              <span class="label">Join the waitlist</span>
-              <span class="spinner" aria-hidden="true"></span>
-            </button>
             <p class="feedback" id="feedback-bottom" role="alert" aria-live="polite"></p>
-            <p class="form-note">One email when it opens. Nothing else, and no card.</p>
+            <p class="form-note">One email, on the day it opens. No card, ever.</p>
           </form>
+        </div>
 
-          <div class="joined" id="joined-bottom">
+        <!-- Everything below appears only after the email is saved. -->
+        <div class="joined" id="joined">
+          <div class="joined-card">
             <p class="joined-head">
-              <svg class="tick" width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <svg width="21" height="21" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
               You are on the list.
             </p>
             <p class="joined-note">
-              We will email you when Zoxia opens. There are two quick questions further
-              up the page if you have a minute.
+              We will email you the day Zoxia opens. If you have a minute, the answers
+              below genuinely shape what gets built next.
             </p>
+
+            <div class="step">
+              <label class="step-q" for="name-after">What should we call you?</label>
+              <input class="named" type="text" id="name-after" autocomplete="name" placeholder="Your name">
+
+              <p class="step-q" id="role-q">And what do you do?</p>
+              <div class="roles" role="group" aria-labelledby="role-q">
+                <button type="button" class="role" data-role="Creator" aria-pressed="false">Creator</button>
+                <button type="button" class="role" data-role="Social media manager" aria-pressed="false">Manager</button>
+                <button type="button" class="role" data-role="Business" aria-pressed="false">Business</button>
+                <button type="button" class="role" data-role="Other" aria-pressed="false">Other</button>
+              </div>
+              <p class="feedback" id="role-feedback" role="status" aria-live="polite"></p>
+            </div>
+
+            <div class="step">
+              <label class="step-q" for="q-lost">Have you ever had a scheduled post fail without knowing?</label>
+              <textarea class="ta" id="q-lost" rows="2" placeholder="What happened, and how did you find out?"></textarea>
+
+              <label class="step-q q-gap" for="q-proof">What do you send a brand when they ask for your numbers?</label>
+              <textarea class="ta" id="q-proof" rows="2" placeholder="Screenshots, a media kit, or something else?"></textarea>
+
+              <div class="step-actions">
+                <button type="button" class="btn btn-outline" id="answers-btn">
+                  <span class="label">Send answers</span>
+                  <span class="spinner" aria-hidden="true"></span>
+                </button>
+              </div>
+              <p class="feedback" id="answers-feedback" role="alert" aria-live="polite"></p>
+            </div>
           </div>
         </div>
       </div>

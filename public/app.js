@@ -4,8 +4,9 @@
  *
  * Three jobs, in the order they matter:
  *   1. Take an email and say honestly whether it saved.
- *   2. Ask the two research questions, but only after the email is safe.
- *   3. Resolve the record in the hero, and reveal sections on scroll.
+ *   2. Ask for the name, the role and the two research questions, all of it
+ *      afterwards, where saying no costs the signup nothing.
+ *   3. Resolve the record, and reveal sections on scroll.
  *
  * No scroll listeners anywhere. IntersectionObserver only.
  */
@@ -14,11 +15,11 @@
 
   var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  /* Lets CSS know it may hide things it will later animate in. Without JS
-     every element stays visible, which is the correct fallback. */
+  /* Lets CSS hide things it will animate in. With no JS everything stays
+     visible, which is the correct fallback. */
   document.documentElement.classList.add('js');
 
-  /** Whoever just joined, set on a successful submit. */
+  /** Whoever just joined. Set on a successful submit. */
   var joinedEmail = '';
 
   function setBusy(btn, busy) {
@@ -33,29 +34,41 @@
     el.className = 'feedback' + (isError ? ' error' : '');
   }
 
+  function post(body) {
+    return fetch('/api/waitlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(body),
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (data) {
+        return { ok: r.ok, data: data };
+      });
+    });
+  }
+
+  /** The name is optional and asked for late, so it is sent when we have it. */
+  function currentName() {
+    var el = document.getElementById('name-after');
+    return el && el.value.trim() ? el.value.trim() : undefined;
+  }
+
   /* ==========================================================================
      1. The email
      ========================================================================== */
-  function setupForm(formId, nameId, emailId, feedbackId, joinedId, source) {
+  function setupForm(formId, emailId, feedbackId, source) {
     var form = document.getElementById(formId);
-    var nameInput = document.getElementById(nameId);
     var emailInput = document.getElementById(emailId);
     var feedback = document.getElementById(feedbackId);
-    var joined = document.getElementById(joinedId);
     if (!form || !emailInput) return;
 
     var button = form.querySelector('button[type="submit"]');
 
-    [nameInput, emailInput].forEach(function (input) {
-      if (input) input.addEventListener('input', function () { say(feedback, ''); });
-    });
+    emailInput.addEventListener('input', function () { say(feedback, ''); });
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      var name = nameInput ? nameInput.value.trim() : '';
       var email = emailInput.value.trim();
-
       if (!email) {
         say(feedback, 'Please enter your email address.', true);
         emailInput.focus();
@@ -68,25 +81,14 @@
       }
 
       setBusy(button, true);
-      if (nameInput) nameInput.disabled = true;
       emailInput.disabled = true;
       say(feedback, '');
 
-      fetch('/api/waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({
-          name: name,
-          email: email.toLowerCase(),
-          source: source,
-          submittedAt: new Date().toISOString(),
-        }),
+      post({
+        email: email.toLowerCase(),
+        source: source,
+        submittedAt: new Date().toISOString(),
       })
-        .then(function (r) {
-          return r.json().catch(function () { return {}; }).then(function (data) {
-            return { ok: r.ok, data: data };
-          });
-        })
         .then(function (res) {
           /**
            * A failure is told, not hidden.
@@ -99,8 +101,7 @@
            */
           if (res.ok && res.data && res.data.success) {
             joinedEmail = email.toLowerCase();
-            form.style.display = 'none';
-            if (joined) joined.setAttribute('data-open', 'true');
+            reveal();
           } else {
             say(feedback, (res.data && res.data.error) || 'That did not save. Try again in a moment.', true);
             restore();
@@ -113,31 +114,32 @@
 
       function restore() {
         setBusy(button, false);
-        if (nameInput) nameInput.disabled = false;
         emailInput.disabled = false;
       }
     });
   }
 
-  /* ==========================================================================
-     2. The two questions, and the role
-     ========================================================================== */
-
   /**
-   * Either form can open the panel, so the email is whichever one was used.
-   * Reading a single hard-coded input here meant a signup from the bottom
-   * form silently dropped its role and answers.
+   * One panel, shared by both forms. Whichever one they used, the follow-up
+   * questions live in a single place, so there is no second copy to keep in
+   * step and no way to answer them twice.
    */
-  function currentEmail() {
-    if (joinedEmail) return joinedEmail;
-    var ids = ['email-top', 'email-bottom'];
-    for (var i = 0; i < ids.length; i++) {
-      var el = document.getElementById(ids[i]);
-      if (el && el.value.trim()) return el.value.trim().toLowerCase();
-    }
-    return '';
+  function reveal() {
+    var panel = document.getElementById('joined');
+    if (!panel) return;
+
+    Array.prototype.forEach.call(document.querySelectorAll('.signup'), function (el) {
+      el.style.display = 'none';
+    });
+    panel.setAttribute('data-open', 'true');
+
+    var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    panel.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'center' });
   }
 
+  /* ==========================================================================
+     2. Name, role, and the two questions
+     ========================================================================== */
   function setupRoles() {
     var buttons = document.querySelectorAll('.role');
     var feedback = document.getElementById('role-feedback');
@@ -145,8 +147,7 @@
 
     Array.prototype.forEach.call(buttons, function (btn) {
       btn.addEventListener('click', function () {
-        var email = currentEmail();
-        if (!email) {
+        if (!joinedEmail) {
           say(feedback, 'We lost track of your email. Refresh and join again.', true);
           return;
         }
@@ -155,18 +156,15 @@
           b.setAttribute('aria-pressed', String(b === btn));
         });
 
-        fetch('/api/waitlist', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: email,
-            role: btn.getAttribute('data-role'),
-            source: 'survey',
-          }),
+        post({
+          email: joinedEmail,
+          name: currentName(),
+          role: btn.getAttribute('data-role'),
+          source: 'survey',
         })
-          .then(function (r) { return r.json().catch(function () { return {}; }); })
-          .then(function (data) {
-            say(feedback, data && data.success ? 'Saved, thank you.' : 'That did not save.', !(data && data.success));
+          .then(function (res) {
+            var ok = res.ok && res.data && res.data.success;
+            say(feedback, ok ? 'Saved, thank you.' : 'That did not save.', !ok);
           })
           .catch(function () { say(feedback, 'That did not save.', true); });
       });
@@ -189,8 +187,7 @@
     if (!button || !lost || !proof) return;
 
     button.addEventListener('click', function () {
-      var email = currentEmail();
-      if (!email) {
+      if (!joinedEmail) {
         say(feedback, 'We lost track of your email. Refresh and join again.', true);
         return;
       }
@@ -205,25 +202,21 @@
       setBusy(button, true);
       say(feedback, '');
 
-      fetch('/api/waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: email,
-          everLostAPost: everLostAPost || undefined,
-          proofForBrands: proofForBrands || undefined,
-          source: 'answers',
-        }),
+      post({
+        email: joinedEmail,
+        name: currentName(),
+        everLostAPost: everLostAPost || undefined,
+        proofForBrands: proofForBrands || undefined,
+        source: 'answers',
       })
-        .then(function (r) { return r.json().catch(function () { return {}; }); })
-        .then(function (data) {
-          if (data && data.success) {
+        .then(function (res) {
+          if (res.ok && res.data && res.data.success) {
             say(feedback, 'Got it. That genuinely helps.');
             lost.disabled = true;
             proof.disabled = true;
             button.style.display = 'none';
           } else {
-            say(feedback, (data && data.error) || 'That did not save. Try again.', true);
+            say(feedback, (res.data && res.data.error) || 'That did not save. Try again.', true);
             setBusy(button, false);
           }
         })
@@ -240,53 +233,38 @@
 
   var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /**
-   * The record resolves one row at a time because that is what actually
-   * happens: confirmations come back from each platform at different times.
-   * It runs once, when it first comes into view, and then stops.
-   */
-  function setupRecord() {
-    var record = document.getElementById('record');
-    if (!record) return;
-    if (still || !('IntersectionObserver' in window)) {
-      record.classList.add('resolved');
-      return;
-    }
-
+  function once(el, cls, threshold) {
+    if (!el) return;
+    if (still || !('IntersectionObserver' in window)) { el.classList.add(cls); return; }
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (!entry.isIntersecting) return;
-        record.classList.add('resolved');
-        io.disconnect();
+        entry.target.classList.add(cls);
+        io.unobserve(entry.target);
       });
-    }, { threshold: 0.35 });
-
-    io.observe(record);
+    }, { threshold: threshold, rootMargin: '0px 0px -40px 0px' });
+    io.observe(el);
   }
+
+  /**
+   * The record resolves one row at a time because that is what actually
+   * happens: each platform answers at its own pace.
+   */
+  function setupRecord() { once(document.getElementById('record'), 'resolved', 0.3); }
 
   function setupReveal() {
     var items = document.querySelectorAll('.reveal');
-    if (!items.length) return;
     if (still || !('IntersectionObserver' in window)) {
       Array.prototype.forEach.call(items, function (el) { el.classList.add('seen'); });
       return;
     }
-
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('seen');
-        io.unobserve(entry.target);
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-
-    Array.prototype.forEach.call(items, function (el) { io.observe(el); });
+    Array.prototype.forEach.call(items, function (el) { once(el, 'seen', 0.12); });
   }
 
   /* ========================================================================== */
   function init() {
-    setupForm('form-top', 'name-top', 'email-top', 'feedback-top', 'joined-top', 'hero');
-    setupForm('form-bottom', 'name-bottom', 'email-bottom', 'feedback-bottom', 'joined-bottom', 'footer');
+    setupForm('form-top', 'email-top', 'feedback-top', 'hero');
+    setupForm('form-bottom', 'email-bottom', 'feedback-bottom', 'footer');
     setupRoles();
     setupAnswers();
     setupRecord();
