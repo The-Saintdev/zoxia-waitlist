@@ -12,19 +12,21 @@
   <meta property="og:url" content="https://zoxia.site/">
   <meta property="og:title" content="Zoxia, scheduling that confirms the post went out">
   <meta property="og:description" content="Most schedulers know they sent your post. Zoxia asks the platform whether it published, and tells you which destination refused it and why.">
-  <meta property="og:image" content="https://zoxia.site/assets/logo-standalone.png">
+  <meta property="og:image" content="https://zoxia.site/assets/og.png">
 
   <!-- Twitter Meta -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://zoxia.site/">
   <meta name="twitter:title" content="Zoxia, scheduling that confirms the post went out">
   <meta name="twitter:description" content="Most schedulers know they sent your post. Zoxia asks the platform whether it published, and tells you which destination refused it and why.">
-  <meta name="twitter:image" content="https://zoxia.site/assets/logo-standalone.png">
+  <meta name="twitter:image" content="https://zoxia.site/assets/og.png">
 
   <!-- Favicons -->
+  <!-- 180px, 33KB. The tab icon was pointing at the 1024px original, so every
+       visitor downloaded half a megabyte to fill sixteen pixels. -->
   <meta name="theme-color" content="#ffffff">
-  <link rel="icon" type="image/png" href="assets/logo-standalone.png">
-  <link rel="apple-touch-icon" href="assets/logo-standalone.png">
+  <link rel="icon" type="image/png" href="assets/icon.png">
+  <link rel="apple-touch-icon" href="assets/icon.png">
 
   <!--
     Self-hosted, not linked from Google. The audience pays for its own data,
@@ -198,7 +200,7 @@
       text-decoration: none;
       color: var(--ink);
     }
-    .brand svg { width: 21px; height: 21px; display: block; color: var(--violet); }
+    .brand-mark { width: 26px; height: auto; display: block; }
     .brand-name { font-size: 19px; font-weight: 600; letter-spacing: -0.03em; }
 
     /* ------------------------------------------------------------- buttons -- */
@@ -891,9 +893,17 @@
   <header class="nav">
     <div class="nav-inner">
       <a class="brand" href="/" aria-label="Zoxia, home">
-        <svg viewBox="0 0 512 512" fill="none" aria-hidden="true" focusable="false">
-          <path d="M 96 112 L 416 112 L 416 176 L 240 176 L 368 336 L 416 336 L 416 400 L 96 400 L 96 336 L 272 336 L 144 176 L 96 176 Z" fill="currentColor"/>
-        </svg>
+        <!--
+          The real mark, scaled from the app's own `assets/images/zoxia-mark.png`,
+          which is the only copy anywhere with real transparency.
+
+          This used to be a geometric "Z" recoloured from `logo.svg`, which
+          predates the rebrand, so the site was wearing a logo the product does
+          not use. The obvious replacement, `logo-standalone.png`, turned out to
+          be a JPEG with a transparency checkerboard painted into it, which is
+          why the first attempt rendered a grey chequered square.
+        -->
+        <img class="brand-mark" src="assets/mark.png" width="96" height="81" alt="" decoding="async">
         <span class="brand-name">Zoxia</span>
       </a>
       <a class="btn btn-primary btn-nav" href="#join">Join the waitlist</a>
