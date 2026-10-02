@@ -19,7 +19,7 @@ import { cp, mkdir, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 
 const FILES = ['index.html', 'app.js'];
-const DIRS = ['assets'];
+const DIRS = ['assets', 'r'];
 const OUT = 'public';
 
 await mkdir(OUT, { recursive: true });

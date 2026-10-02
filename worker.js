@@ -50,6 +50,43 @@ export default {
     }
 
     // 3. Serve Static Assets
+    /**
+     * Receipt links: zoxia.site/r/<slug>
+     *
+     * The slug is data, not a file, so the asset handler would 404 on every
+     * one of them. Rewritten to the single page, which reads the slug from
+     * the path and fetches it from the API.
+     *
+     * A rewrite rather than a redirect: the URL stays exactly as the creator
+     * sent it, which matters for a link somebody forwards to a brand.
+     *
+     * This page belongs to the product rather than to the waitlist, and it
+     * lives here because this Worker is what serves zoxia.site. If the site
+     * ever moves to the `Website/` folder in the app repo, this moves with
+     * it. See [[Spec - Post Receipts]].
+     */
+    if (url.pathname.startsWith('/r/') && url.pathname !== '/r/') {
+      /**
+       * Fetched and returned in place, rather than handed back as a rewrite.
+       *
+       * Cloudflare's asset handler normalises `/r/index.html` to `/r/` with a
+       * 307, which a browser follows, and the slug disappears out of the
+       * address bar before the page can read it. Serving the body under the
+       * original URL keeps the link the creator sent intact.
+       */
+      const page = await env.ASSETS.fetch(new URL('/r/', url));
+      return new Response(page.body, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+          // A receipt is somebody's commercial position, so it is not cached
+          // at the edge where a revoked one could outlive its revocation.
+          'Cache-Control': 'no-store',
+          'X-Robots-Tag': 'noindex, nofollow',
+        },
+      });
+    }
+
     if (env.ASSETS) {
       return env.ASSETS.fetch(request);
     }

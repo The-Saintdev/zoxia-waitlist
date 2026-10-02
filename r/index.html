@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Published by Zoxia</title>
+
+  <!--
+    A creator sends this link to a brand. The brand has never heard of us, so
+    nothing here may assume they have.
+
+    Not indexed. A receipt is somebody's commercial position and the slug is
+    the only thing keeping it private; a search engine that crawled one would
+    undo that.
+  -->
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" type="image/png" href="/favicon.png">
+
+  <!--
+    Self-contained, and deliberately not using the site's styles.css.
+
+    That stylesheet is still the old dark palette from before the rebrand,
+    and this is the page a paying brand looks at. It carries the current
+    brand rather than waiting for the rest of the site to catch up.
+  -->
+  <style>
+    :root {
+      --ink: #17121d;
+      --ink-2: #57505f;
+      --ink-3: #7d7588;
+      --paper: #ffffff;
+      --paper-2: #f7f4f9;
+      --line: #e6e0ec;
+      --violet: #7a2e9d;
+      --ok: #0b7360;
+      --no: #b83a29;
+      --r: 12px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--paper-2);
+      color: var(--ink);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      padding: 28px 20px 72px;
+    }
+
+    .sheet {
+      max-width: 760px;
+      margin: 0 auto;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    /* ------------------------------------------------------------ header -- */
+    .head { padding: 28px 26px 24px; border-bottom: 1px solid var(--line); }
+
+    .brandline {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink-2);
+      margin-bottom: 18px;
+    }
+    .brandline img { width: 22px; height: auto; display: block; }
+
+    h1 {
+      font-size: clamp(22px, 4.2vw, 30px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+    }
+    .sub { margin-top: 8px; font-size: 15px; color: var(--ink-2); }
+
+    /* ------------------------------------------------- the claim, up top --
+       The whole value of this page is where the numbers came from, so it is
+       said before any number is shown rather than in small print after. */
+    .claim {
+      margin: 0;
+      padding: 18px 26px;
+      background: var(--paper-2);
+      border-bottom: 1px solid var(--line);
+      font-size: 14.5px;
+      color: var(--ink-2);
+    }
+    .claim strong { color: var(--ink); font-weight: 600; }
+
+    /* ------------------------------------------------------------- posts -- */
+    .post { padding: 24px 26px; border-bottom: 1px solid var(--line); }
+    .post:last-of-type { border-bottom: 0; }
+
+    .caption {
+      font-size: 16.5px;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      margin-bottom: 4px;
+    }
+    .when { font-family: var(--mono); font-size: 12.5px; color: var(--ink-3); }
+
+    .dest {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+    .dest:first-of-type { border-top: 0; }
+
+    .dest-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .platform { font-size: 15px; font-weight: 600; }
+    .handle { font-family: var(--mono); font-size: 12.5px; color: var(--ink-3); }
+
+    .state { font-family: var(--mono); font-size: 13px; font-weight: 500; }
+    .state.ok { color: var(--ok); }
+    .state.no { color: var(--no); }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td {
+      text-align: right;
+      padding: 7px 0;
+      font-family: var(--mono);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+      border-bottom: 1px solid var(--line);
+    }
+    th {
+      color: var(--ink-3);
+      font-weight: 500;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    th:first-child, td:first-child { text-align: left; }
+    tr:last-child td { border-bottom: 0; }
+
+    /* A figure the platform withheld. Blank, with a reason on hover, rather
+       than a zero that would read as "nobody watched it". */
+    .absent { color: var(--ink-3); }
+
+    .note {
+      margin-top: 10px;
+      font-size: 13.5px;
+      color: var(--ink-3);
+    }
+
+    /* ------------------------------------------------------------- footer -- */
+    .foot {
+      max-width: 760px;
+      margin: 18px auto 0;
+      font-size: 13px;
+      color: var(--ink-3);
+      text-align: center;
+      line-height: 1.65;
+    }
+    .foot a { color: var(--violet); }
+
+    .state-msg {
+      max-width: 760px;
+      margin: 0 auto;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 48px 26px;
+      text-align: center;
+    }
+    .state-msg h1 { margin-bottom: 10px; }
+    .state-msg p { color: var(--ink-2); font-size: 15px; }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <div class="state-msg"><p>Loading…</p></div>
+  </div>
+
+  <p class="foot" id="foot"></p>
+
+<script>
+(function () {
+  'use strict';
+
+  var LOCAL = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  var API = LOCAL ? location.origin + '/api' : 'https://api.zoxia.site/api';
+
+  /**
+   * The slug is the last path segment, so the link reads zoxia.site/r/<slug>.
+   * Falls back to ?s= for hosts that cannot rewrite.
+   */
+  function slugFromUrl() {
+    var fromQuery = new URLSearchParams(location.search).get('s');
+    if (fromQuery) return fromQuery;
+    var parts = location.pathname.split('/').filter(Boolean);
+    return parts[parts.length - 1] === 'r' ? '' : parts[parts.length - 1] || '';
+  }
+
+  var root = document.getElementById('root');
+  var foot = document.getElementById('foot');
+
+  function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (ch) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+    });
+  }
+
+  function gone(title, body) {
+    root.innerHTML =
+      '<div class="state-msg"><h1>' + escapeHtml(title) + '</h1><p>' + escapeHtml(body) + '</p></div>';
+  }
+
+  function date(iso) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function ageLabel(minutes) {
+    if (minutes < 60) return minutes + ' min';
+    var hours = Math.round(minutes / 60);
+    if (hours < 48) return hours + (hours === 1 ? ' hour' : ' hours');
+    var days = Math.round(hours / 24);
+    return days + (days === 1 ? ' day' : ' days');
+  }
+
+  function number(value) {
+    // A count the platform did not report is blank, never zero. This is the
+    // single rule the page's credibility rests on.
+    if (typeof value !== 'number') return '<span class="absent" title="The platform did not report this">&mdash;</span>';
+    return value.toLocaleString('en-GB');
+  }
+
+  /** Platforms spell their own names. "tiktok" on a brand's screen is sloppy. */
+  var NAMES = { tiktok: 'TikTok', linkedin: 'LinkedIn', x: 'X' };
+  function platformName(id) {
+    return NAMES[id] || (String(id || '').charAt(0).toUpperCase() + String(id || '').slice(1));
+  }
+
+  function destination(dest) {
+    var confirmed = dest.confirmState === 'confirmed';
+    var refused = dest.status === 'failed' || dest.confirmState === 'rejected';
+    var name = platformName(dest.platform);
+
+    var html = '<div class="dest"><div class="dest-head">' +
+      '<div><span class="platform">' + escapeHtml(name) + '</span>' +
+      (dest.username ? ' <span class="handle">@' + escapeHtml(dest.username) + '</span>' : '') +
+      '</div>' +
+      '<span class="state ' + (refused ? 'no' : confirmed ? 'ok' : '') + '">' +
+      (refused ? 'refused' : confirmed ? 'confirmed by ' + escapeHtml(name) : escapeHtml(dest.status)) +
+      '</span></div>';
+
+    var points = (dest.snapshots || []).filter(function (s) {
+      return typeof s.views === 'number' || typeof s.likes === 'number' ||
+             typeof s.comments === 'number' || typeof s.shares === 'number';
+    });
+
+    if (points.length) {
+      html += '<table><thead><tr><th>After</th><th>Views</th><th>Likes</th><th>Comments</th><th>Shares</th></tr></thead><tbody>';
+      points.forEach(function (p) {
+        html += '<tr><td>' + escapeHtml(ageLabel(p.ageMinutes)) + '</td>' +
+          '<td>' + number(p.views) + '</td>' +
+          '<td>' + number(p.likes) + '</td>' +
+          '<td>' + number(p.comments) + '</td>' +
+          '<td>' + number(p.shares) + '</td></tr>';
+      });
+      html += '</tbody></table>';
+    } else if (dest.metricsNote) {
+      html += '<p class="note">' + escapeHtml(dest.metricsNote) + '</p>';
+    }
+
+    return html + '</div>';
+  }
+
+  function render(data) {
+    var receipt = data.receipt;
+    var assurance = data.assurance || {};
+
+    var covers = receipt.coversFrom
+      ? date(receipt.coversFrom) + (receipt.coversTo && receipt.coversTo !== receipt.coversFrom
+          ? ' to ' + date(receipt.coversTo) : '')
+      : '';
+
+    var html = '<div class="sheet"><div class="head">' +
+      '<p class="brandline"><img src="/favicon.png" alt=""> Zoxia</p>' +
+      '<h1>' + escapeHtml(receipt.title || ((receipt.creatorName || 'A creator') + '’s published posts')) + '</h1>' +
+      (covers ? '<p class="sub">' + escapeHtml(covers) + '</p>' : '') +
+      '</div>';
+
+    html += '<p class="claim"><strong>Zoxia published these posts.</strong> ' +
+      escapeHtml(assurance.source || 'Read from each platform directly, on the dates shown.') + ' ' +
+      escapeHtml(assurance.note || 'A figure a platform did not report is left blank rather than shown as zero.') +
+      ' This page is generated by Zoxia and the creator cannot edit it.</p>';
+
+    receipt.posts.forEach(function (post) {
+      html += '<div class="post">' +
+        '<p class="caption">' + escapeHtml(post.caption || 'Untitled post') + '</p>' +
+        '<p class="when">published ' + escapeHtml(date(post.publishedAt || post.scheduledAt)) + '</p>';
+      (post.destinations || []).forEach(function (dest) { html += destination(dest); });
+      html += '</div>';
+    });
+
+    html += '</div>';
+    root.innerHTML = html;
+
+    foot.innerHTML = 'Published and verified by <a href="https://zoxia.site">Zoxia</a>. ' +
+      'Zoxia schedules posts for creators and confirms with each platform that they went out.';
+  }
+
+  var slug = slugFromUrl();
+  if (!slug) {
+    gone('That page was not found', 'This link does not point at a report.');
+    return;
+  }
+
+  fetch(API + '/public/receipts/' + encodeURIComponent(slug), {
+    headers: { Accept: 'application/json' }
+  })
+    .then(function (response) {
+      if (response.status === 404) {
+        // A withdrawn link and a link that never existed look identical here,
+        // on purpose. Saying which would let the slug space be probed, and
+        // would tell the holder something the creator chose to stop telling
+        // them.
+        gone('That page was not found', 'This report is no longer available.');
+        return null;
+      }
+      if (!response.ok) throw new Error('http ' + response.status);
+      return response.json();
+    })
+    .then(function (data) { if (data) render(data); })
+    .catch(function () {
+      gone('That did not load', 'Something went wrong fetching this report. Try again in a moment.');
+    });
+})();
+</script>
+</body>
+</html>
