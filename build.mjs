@@ -18,8 +18,22 @@
 import { cp, mkdir, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 
-const FILES = ['index.html', 'app.js'];
-const DIRS = ['assets', 'r'];
+/**
+ * The legal pages ship with the waitlist, because they have to exist before the
+ * product does. Google's YouTube API audit and its OAuth verification both
+ * require a **publicly reachable** privacy policy, and ours was a 404: it lived
+ * in the Website/ directory, which is not what zoxia.site serves.
+ *
+ * `styles.css` and `favicon.png` come with them. They are the Website/ design
+ * rather than the waitlist's, which is a visible seam and a smaller problem than
+ * an unstyled policy or a missing one.
+ *
+ * `pricing.html` is deliberately not here. The plans page is built and not
+ * launched, and the nav link to it has been removed from these pages rather than
+ * left pointing at a 404 on the one page an auditor reads.
+ */
+const FILES = ['index.html', 'app.js', 'styles.css', 'favicon.png', 'support.html'];
+const DIRS = ['assets', 'r', 'legal'];
 const OUT = 'public';
 
 await mkdir(OUT, { recursive: true });
