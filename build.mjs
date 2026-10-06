@@ -32,7 +32,17 @@ import { existsSync } from 'node:fs';
  * launched, and the nav link to it has been removed from these pages rather than
  * left pointing at a 404 on the one page an auditor reads.
  */
-const FILES = ['index.html', 'app.js', 'styles.css', 'favicon.png', 'support.html'];
+const FILES = [
+  'index.html',
+  'app.js',
+  'styles.css',
+  'favicon.png',
+  'support.html',
+  // The plans page and the page Paystack returns to. They ship together or the
+  // second half of a payment is a 404.
+  'pricing.html',
+  'paid.html',
+];
 const DIRS = ['assets', 'r', 'legal'];
 const OUT = 'public';
 

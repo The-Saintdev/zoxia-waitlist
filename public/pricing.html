@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plans | Zoxia</title>
+<meta name="description" content="What Zoxia costs, in your own currency. Month to month, and it stops when you cancel.">
+<link rel="icon" href="/assets/mark.png" sizes="any">
+<link rel="canonical" href="https://zoxia.site/pricing">
+<meta name="robots" content="noindex">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Zoxia">
+<meta property="og:title" content="Plans | Zoxia">
+<meta property="og:description" content="What Zoxia costs, in your own currency. Month to month, and it stops when you cancel.">
+<meta property="og:url" content="https://zoxia.site/pricing">
+
+<style>
+  /* ==========================================================================
+     The plans page.
+
+     Rebuilt in the site's own language rather than inherited from the version
+     that predates the redesign. Same rules as the homepage, and they are rules
+     rather than preferences:
+
+       Flat colour only.    Panels are solid fills. No gradient goes in one,
+                            because a gradient is the single clearest tell that
+                            nobody chose the colour.
+       No pills.            Nothing is a badge, chip or tag. The recommended
+                            plan is marked with a border and a sentence.
+       Two voices.          Sans is us talking. Mono is a machine's own words:
+                            a currency the server picked, an offer code.
+       Green and red mean   one thing each and are never decoration.
+
+     Self-contained on purpose. The privacy policy promises this site loads
+     nothing from a third party, so a font or a script from a CDN would quietly
+     make that untrue.
+     ========================================================================== */
+
+  @font-face {
+    font-family: 'Geist';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('assets/fonts/geist-latin.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  }
+  @font-face {
+    font-family: 'Geist';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('assets/fonts/geist-latin-ext.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  }
+  @font-face {
+    font-family: 'Geist Mono';
+    font-style: normal;
+    font-weight: 400 500;
+    font-display: swap;
+    src: url('assets/fonts/geistmono-latin.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  }
+
+  :root {
+    --ink: #17121d;
+    --ink-2: #57505f;
+    --ink-3: #7d7588;
+
+    --paper: #ffffff;
+    --paper-2: #f7f4f9;
+    --line: #e6e0ec;
+    --line-2: #d3cadb;
+
+    --violet: #7a2e9d;
+    --violet-dark: #5f2179;
+
+    --panel-violet: #ebdcf4;
+    --panel-mint: #cbf1e6;
+    --panel-butter: #fbe7b3;
+    --panel-blush: #fbdcd5;
+
+    --ok: #0b7360;
+    --no: #b83a29;
+
+    --r-ctl: 12px;
+    --r-panel: 20px;
+
+    --shadow: 0 1px 2px rgba(23, 18, 29, 0.05), 0 10px 28px rgba(23, 18, 29, 0.07);
+    --shadow-sm: 0 1px 2px rgba(23, 18, 29, 0.06), 0 4px 12px rgba(23, 18, 29, 0.05);
+
+    --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --gutter: 20px;
+    --measure: 1140px;
+  }
+
+  @media (min-width: 768px)  { :root { --gutter: 32px; } }
+  @media (min-width: 1200px) { :root { --gutter: 48px; } }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: var(--measure);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  a { color: inherit; }
+
+  :focus-visible {
+    outline: 3px solid var(--violet);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  /* ------------------------------------------------------------ navigation -- */
+  .nav {
+    position: sticky; top: 0; z-index: 20;
+    height: 68px;
+    display: flex; align-items: center;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; width: 100%; max-width: var(--measure);
+    margin-inline: auto; padding-inline: var(--gutter);
+  }
+  .brand { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; color: var(--ink); }
+  .brand-mark { width: 26px; height: auto; display: block; }
+  .brand-name { font-size: 19px; font-weight: 600; letter-spacing: -0.03em; }
+  .nav-links { display: flex; gap: 18px; font-size: 15px; font-weight: 500; }
+  .nav-links a { color: var(--ink-2); text-decoration: none; }
+  .nav-links a:hover { color: var(--ink); text-decoration: underline; }
+
+  /* --------------------------------------------------------------- buttons -- */
+  .btn {
+    position: relative;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 50px; padding: 13px 24px;
+    border: 2px solid transparent; border-radius: var(--r-ctl);
+    font-family: var(--font-sans); font-size: 16px; font-weight: 600;
+    letter-spacing: -0.01em; cursor: pointer; white-space: nowrap; text-decoration: none;
+    transition: background-color 150ms var(--ease), transform 90ms var(--ease),
+                border-color 150ms var(--ease), color 150ms var(--ease);
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn:disabled { cursor: default; opacity: 0.6; }
+  .btn-primary { background: var(--violet); color: #ffffff; }
+  .btn-primary:hover:not(:disabled) { background: var(--violet-dark); }
+  .btn-outline {
+    background: transparent; color: var(--ink); border-color: var(--line-2);
+    min-height: 44px; padding: 10px 18px; font-size: 15px;
+  }
+  .btn-outline:hover:not(:disabled) { border-color: var(--ink); background: var(--paper-2); }
+  .btn-full { width: 100%; }
+
+  .btn .label { transition: opacity 120ms linear; }
+  .btn.loading .label { opacity: 0; }
+  .btn .spinner {
+    position: absolute; width: 17px; height: 17px;
+    border: 2px solid rgba(255, 255, 255, 0.35); border-top-color: #ffffff;
+    border-radius: 50%; opacity: 0; animation: spin 620ms linear infinite;
+  }
+  .btn-outline .spinner { border-color: rgba(23, 18, 29, 0.2); border-top-color: var(--ink); }
+  .btn.loading .spinner { opacity: 1; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .btn .spinner { animation-duration: 1600ms; } }
+
+  /* ------------------------------------------------------------ background -- */
+  .grid {
+    position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(to right, rgba(23, 18, 29, 0.055) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(23, 18, 29, 0.055) 1px, transparent 1px);
+    background-size: 72px 72px;
+    background-position: center top;
+    -webkit-mask-image: radial-gradient(ellipse 78% 62% at 50% 30%, #000 30%, transparent 76%);
+    mask-image: radial-gradient(ellipse 78% 62% at 50% 30%, #000 30%, transparent 76%);
+  }
+
+  /* ----------------------------------------------------------------- head -- */
+  .head { position: relative; padding-block: 56px 36px; }
+  .head > .wrap { position: relative; z-index: 1; max-width: 760px; }
+
+  h1 {
+    font-size: clamp(34px, 6vw, 52px);
+    line-height: 1.06;
+    letter-spacing: -0.035em;
+    font-weight: 700;
+  }
+  .lede { margin-top: 16px; font-size: 18px; color: var(--ink-2); }
+  .lede strong { color: var(--ink); font-weight: 600; }
+
+  /* ---------------------------------------------------------------- offer -- */
+  .offer {
+    background: var(--panel-butter);
+    border: 2px solid #e8c871;
+    border-radius: var(--r-panel);
+    padding: 26px;
+    margin-top: 32px;
+  }
+  @media (min-width: 720px) { .offer { padding: 30px 34px; } }
+
+  .offer-head {
+    font-size: clamp(22px, 3.4vw, 30px);
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    font-weight: 700;
+  }
+  .offer-body { margin-top: 10px; font-size: 16.5px; color: #6b5420; }
+  .offer-body strong { color: #4a3812; font-weight: 600; }
+
+  /* The count, in mono, because it is a fact from the server rather than a
+     claim we are making. */
+  .offer-left {
+    margin-top: 14px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: #6b5420;
+  }
+
+  /* ---------------------------------------------------------------- plans -- */
+  .plans { padding-block: 8px 56px; }
+  .cards {
+    margin-top: 28px;
+    display: grid;
+    gap: 18px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 780px)  { .cards { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1060px) { .cards { grid-template-columns: repeat(3, 1fr); } }
+
+  .plan {
+    display: flex; flex-direction: column;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--r-panel);
+    padding: 26px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  /*
+    The recommended plan, marked with a border and a sentence rather than a
+    badge. A pill floating over a card corner is the thing every template does,
+    and there are none anywhere on this site.
+  */
+  .plan.is-picked { border: 2px solid var(--violet); box-shadow: var(--shadow); }
+  .plan-recommend {
+    font-size: 13.5px; font-weight: 600; color: var(--violet);
+    margin-bottom: 10px;
+  }
+
+  .plan-name { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; }
+
+  .plan-price {
+    margin-top: 14px;
+    font-size: clamp(32px, 4.4vw, 40px);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    font-weight: 700;
+  }
+  .plan-per { font-size: 16px; font-weight: 500; color: var(--ink-3); letter-spacing: -0.01em; }
+
+  /* What it costs once the offer runs out. Never omitted while an offer is on:
+     an offer that does not say what it becomes is one people feel tricked by in
+     month six. */
+  .plan-then { margin-top: 8px; font-size: 14.5px; color: var(--ink-2); }
+
+  .plan-features { list-style: none; margin-top: 20px; display: grid; gap: 9px; flex: 1; }
+  .plan-features li {
+    display: grid; grid-template-columns: 18px 1fr; gap: 9px;
+    font-size: 15.5px; color: var(--ink-2); line-height: 1.45;
+  }
+  .plan-features svg { width: 15px; height: 15px; margin-top: 5px; stroke: var(--ok); fill: none; }
+
+  .plan-cta { margin-top: 22px; }
+
+  .plan-x {
+    margin-top: 16px; padding-top: 16px;
+    border-top: 1px solid var(--line);
+    font-size: 14.5px; color: var(--ink-2);
+  }
+  .plan-x-cta { margin-top: 10px; }
+
+  .note { font-size: 15px; color: var(--ink-2); margin-top: 20px; }
+  .note-bad { color: var(--no); }
+
+  /* ------------------------------------------------------------- checkout -- */
+  .checkout {
+    margin-top: 36px;
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-panel);
+    padding: 26px;
+    max-width: 520px;
+  }
+  @media (min-width: 720px) { .checkout { padding: 30px 32px; } }
+
+  .checkout h2 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+  .checkout-plan { margin-top: 8px; font-size: 15.5px; color: var(--ink-2); }
+
+  .field { margin-top: 18px; }
+  .field label { display: block; font-size: 14.5px; font-weight: 600; margin-bottom: 7px; }
+  .field input {
+    width: 100%; min-height: 50px; padding: 13px 15px;
+    font-family: var(--font-sans); font-size: 16px; color: var(--ink);
+    background: var(--paper);
+    border: 2px solid var(--line-2); border-radius: var(--r-ctl);
+    transition: border-color 150ms var(--ease);
+  }
+  .field input:focus { outline: none; border-color: var(--violet); }
+
+  .form-error {
+    margin-top: 16px; padding: 12px 14px;
+    background: var(--panel-blush); border: 1px solid #f2bfb5; border-radius: var(--r-ctl);
+    font-size: 15px; color: var(--no);
+  }
+
+  /* ------------------------------------------------------------------ faq -- */
+  .faq { border-top: 1px solid var(--line); padding-block: 48px 56px; }
+  .faq > .wrap { max-width: 760px; }
+  .faq h2 { font-size: clamp(24px, 3.6vw, 32px); letter-spacing: -0.03em; font-weight: 700; }
+  .faq-item { margin-top: 28px; }
+  .faq-item h3 { font-size: 17.5px; font-weight: 600; letter-spacing: -0.015em; }
+  .faq-item p { margin-top: 7px; font-size: 16px; color: var(--ink-2); }
+
+  /* --------------------------------------------------------------- footer -- */
+  .foot { border-top: 1px solid var(--line); padding-block: 28px 40px; }
+  .foot-inner {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 12px; font-size: 14.5px; color: var(--ink-3);
+  }
+  .foot-links { display: flex; flex-wrap: wrap; gap: 16px; }
+  .foot a { color: var(--ink-2); text-decoration: none; font-weight: 500; }
+  .foot a:hover { color: var(--ink); text-decoration: underline; }
+  .foot-legal { width: 100%; margin-top: 14px; font-size: 13.5px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<a href="#plans" class="sr-only">Skip to the plans</a>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="/" aria-label="Zoxia, home">
+      <img class="brand-mark" src="assets/mark.png" width="96" height="81" alt="" decoding="async">
+      <span class="brand-name">Zoxia</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="/support">Support</a>
+      <a href="/legal/privacy">Privacy</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="head">
+    <div class="grid" aria-hidden="true"></div>
+    <div class="wrap">
+      <h1>What Zoxia costs</h1>
+      <p class="lede">
+        In your own currency, decided by where you are rather than by a converter.
+        <strong>Month to month</strong>, and it stops when you cancel.
+      </p>
+
+      <!--
+        The offer, when there is one. Built from the server's answer rather than
+        written here: the day the last place goes, this disappears without a
+        release, because a closed offer still being advertised is a promise
+        somebody turns up to collect.
+      -->
+      <div class="offer" id="offer" hidden>
+        <p class="offer-head" id="offer-head"></p>
+        <p class="offer-body" id="offer-body"></p>
+        <p class="offer-left" id="offer-left"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="plans" id="plans">
+    <div class="wrap">
+      <!--
+        Plans come from the API, never typed here. A price written in two places
+        is a price that eventually disagrees with itself, and this page is where
+        somebody decides to hand over money.
+      -->
+      <div class="cards" id="cards"></div>
+      <p class="note" id="status">Loading plans.</p>
+
+      <section class="checkout" id="checkout" hidden>
+        <h2 id="checkout-title">Sign in to continue</h2>
+        <p class="checkout-plan" id="checkout-plan"></p>
+
+        <form id="signin" autocomplete="on" novalidate>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email"
+                   inputmode="email" spellcheck="false" required>
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password"
+                   autocomplete="current-password" required>
+          </div>
+
+          <p class="form-error" id="error" role="alert" hidden></p>
+
+          <div class="plan-cta">
+            <button type="submit" class="btn btn-primary btn-full" id="submit">
+              <span class="label">Continue to payment</span>
+              <span class="spinner" aria-hidden="true"></span>
+            </button>
+          </div>
+        </form>
+
+        <p class="note">
+          No account yet? Create one in the Zoxia app first, then come back here.
+        </p>
+      </section>
+    </div>
+  </section>
+
+  <section class="faq">
+    <div class="wrap">
+      <h2>Before you pay</h2>
+
+      <div class="faq-item" id="faq-offer" hidden>
+        <h3>What happens when the founding price ends?</h3>
+        <p id="faq-offer-body"></p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Why can I not pay inside the app?</h3>
+        <p>
+          Google Play requires its own billing for anything bought inside an Android app, and
+          takes a share of it. Paying here instead keeps that share with us, which is part of how
+          these prices stay where they are.
+        </p>
+      </div>
+
+      <div class="faq-item">
+        <h3>What happens after I pay?</h3>
+        <p>
+          Your plan is active immediately. Open the Zoxia app and it is there. You do not need to
+          enter anything into the app.
+        </p>
+      </div>
+
+      <div class="faq-item">
+        <h3>How do I cancel?</h3>
+        <p>
+          In the app, under your plan. You keep everything you have paid for until the end of the
+          period you already paid for, then move back to Free. There is no cancellation fee and
+          nobody to email.
+        </p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Which card can I use?</h3>
+        <p>
+          Any Nigerian card, plus bank transfer and USSD where your bank supports them. Payment is
+          handled by Paystack and we never see your card details. See our
+          <a href="/legal/privacy">Privacy Policy</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-inner">
+    <span>Zoxia, by Cresco Ai LTD</span>
+    <span class="foot-links">
+      <a href="/legal/privacy">Privacy</a>
+      <a href="/legal/terms">Terms</a>
+      <a href="/support">Support</a>
+      <a href="mailto:hello@zoxia.site">hello@zoxia.site</a>
+    </span>
+    <p class="foot-legal">
+      TikTok, LinkedIn, YouTube and X are trademarks of their respective owners and do not
+      endorse Zoxia.
+    </p>
+  </div>
+</footer>
+
+<script>
+/*
+ * Buying a plan, on the web, because the app is not allowed to sell one.
+ *
+ * Google Play requires Play Billing for anything purchased inside an Android app
+ * and Nigeria is in none of its alternative-billing programmes, so the app
+ * carries no checkout at all and this page is the only way to pay.
+ *
+ * Inline and dependency-free on purpose. The privacy policy promises this site
+ * loads nothing from a third party, and a script tag pointing at a CDN would
+ * quietly make that untrue.
+ */
+(function () {
+  'use strict';
+
+  /*
+   * Production unless this is being served locally, in which case talk to
+   * whatever is serving the page. Lets this be developed against a local backend
+   * without editing the file and risking the edit being committed.
+   */
+  var LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  var API = LOCAL ? location.origin + '/api' : 'https://api.zoxia.site/api';
+
+  var cardsEl = document.getElementById('cards');
+  var statusEl = document.getElementById('status');
+  var offerEl = document.getElementById('offer');
+  var checkout = document.getElementById('checkout');
+  var checkoutPlan = document.getElementById('checkout-plan');
+  var form = document.getElementById('signin');
+  var submit = document.getElementById('submit');
+  var errorEl = document.getElementById('error');
+
+  var chosen = null;
+  var offer = null;
+
+  function text(el, value) { el.textContent = value; }
+
+  function fail(message) {
+    text(errorEl, message);
+    errorEl.hidden = false;
+  }
+
+  function clearError() {
+    errorEl.hidden = true;
+    text(errorEl, '');
+  }
+
+  function el(tag, className, content) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    if (content !== undefined) node.textContent = content;
+    return node;
+  }
+
+  /** A tick, drawn rather than typed. An emoji would be a third party's font. */
+  function tick() {
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('aria-hidden', 'true');
+    var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', 'M5 12.5l4.6 4.6L19 7.4');
+    path.setAttribute('stroke-width', '2.6');
+    path.setAttribute('stroke-linecap', 'round');
+    path.setAttribute('stroke-linejoin', 'round');
+    svg.appendChild(path);
+    return svg;
+  }
+
+  /**
+   * A response's JSON, or a sentence a person can act on.
+   *
+   * Calling r.json() directly is fine until something upstream answers with
+   * something that is not JSON — a gateway timeout page, a proxy error, a
+   * maintenance screen. Then the parse throws and its message goes straight to
+   * the screen, so the last thing somebody sees before paying us money is
+   * "Unexpected token 'o'". That happened here on the first run.
+   */
+  function asJson(response, fallback) {
+    return response.text().then(function (raw) {
+      var body = null;
+      try { body = raw ? JSON.parse(raw) : null; } catch (e) { body = null; }
+      if (!response.ok) throw new Error((body && body.error) || fallback);
+      if (!body) throw new Error(fallback);
+      return body;
+    });
+  }
+
+  /* ----------------------------------------------------------------- offer -- */
+
+  function showOffer(data) {
+    offer = data.offer || null;
+    if (!offer) return;
+
+    text(
+      document.getElementById('offer-head'),
+      offer.percentOff + '% off for your first ' + offer.months + ' months'
+    );
+
+    var total = offer.placesTotal;
+
+    text(
+      document.getElementById('offer-body'),
+      (total ? 'The first ' + total + ' people to join' : 'Join now and you') +
+        ' pay a founding price for ' + offer.months + ' months. After that your plan renews at ' +
+        'its normal price, and we tell you a month before that happens.'
+    );
+
+    /*
+     * The count, because the cap is real and a promise with no number behind it
+     * is one the person after the last place finds out about. Only shown when
+     * the server gave one — an uncapped offer has nothing honest to count.
+     */
+    var left = document.getElementById('offer-left');
+    if (offer.placesLeft === null || !total) {
+      left.hidden = true;
+    } else if (offer.placesLeft >= total) {
+      // Nothing taken yet. "150 of 150 left" is arithmetic, not a sentence.
+      text(left, total + ' places, all still open');
+    } else {
+      text(left, offer.placesLeft + ' of ' + total + ' places left');
+    }
+
+    offerEl.hidden = false;
+
+    var faq = document.getElementById('faq-offer');
+    text(
+      document.getElementById('faq-offer-body'),
+      'Your plan renews at its normal price from month ' + (offer.months + 1) + '. We send you a ' +
+        'message a month before the first full charge, so it is never a surprise on your ' +
+        'statement, and you can cancel any time before then.'
+    );
+    faq.hidden = false;
+  }
+
+  /* ----------------------------------------------------------------- plans -- */
+
+  function planCard(plan) {
+    var card = el('div', 'plan' + (plan.popular ? ' is-picked' : ''));
+
+    if (plan.popular) card.appendChild(el('p', 'plan-recommend', 'Most people pick this one'));
+
+    card.appendChild(el('p', 'plan-name', plan.name));
+
+    /*
+     * The offer price where there is one, and what it becomes underneath it.
+     * Both numbers, always: the comparison is what makes the offer persuasive,
+     * and hiding the second is how an offer becomes a complaint in month six.
+     */
+    var usingOffer = Boolean(plan.offerPrice);
+    var price = el('p', 'plan-price', usingOffer ? plan.offerPrice.price : plan.price);
+    price.appendChild(el('span', 'plan-per', ' / ' + plan.period));
+    card.appendChild(price);
+
+    if (usingOffer) {
+      card.appendChild(
+        el(
+          'p',
+          'plan-then',
+          'for ' + plan.offerPrice.months + ' months, then ' + plan.offerPrice.thenPrice +
+            ' / ' + plan.period
+        )
+      );
+    }
+
+    var list = el('ul', 'plan-features');
+    (plan.features || []).forEach(function (feature) {
+      var li = document.createElement('li');
+      li.appendChild(tick());
+      li.appendChild(el('span', null, feature));
+      list.appendChild(li);
+    });
+    card.appendChild(list);
+
+    var cta = el('div', 'plan-cta');
+    cta.appendChild(choose(plan, false, 'Choose ' + plan.name, 'btn btn-primary btn-full'));
+    card.appendChild(cta);
+
+    /*
+     * The X variant, only when the server offers one.
+     *
+     * It stops offering one while X is shut, which is the point: X is built and
+     * deliberately closed, and selling a dearer plan for a platform the publish
+     * gate refuses on every post would be taking money for nothing.
+     */
+    if (plan.withX) {
+      card.appendChild(
+        el(
+          'p',
+          'plan-x',
+          'With X: ' + plan.withX.price + ' / ' + plan.period + ', including ' +
+            plan.withX.xPostsPerMonth + ' X posts a month.'
+        )
+      );
+      var xcta = el('div', 'plan-x-cta');
+      xcta.appendChild(
+        choose(plan, true, 'Choose ' + plan.name + ' with X', 'btn btn-outline btn-full')
+      );
+      card.appendChild(xcta);
+    }
+
+    return card;
+  }
+
+  function choose(plan, withX, label, className) {
+    var button = el('button', className);
+    button.type = 'button';
+    button.appendChild(el('span', 'label', label));
+
+    button.addEventListener('click', function () {
+      /*
+       * The offer code travels with the choice, and only when this plan actually
+       * has an offer price. The server resolves it again before charging
+       * anything, so a code sent from here cannot grant a discount by itself —
+       * but sending the wrong one would show a price we then do not honour.
+       */
+      chosen = {
+        planId: plan.id,
+        withX: withX,
+        promoCode: !withX && plan.offerPrice && offer ? offer.code : undefined
+      };
+
+      clearError();
+
+      var now = withX ? plan.withX.price : (plan.offerPrice ? plan.offerPrice.price : plan.price);
+      var line = plan.name + (withX ? ' with X' : '') + ', ' + now + ' / ' + plan.period + '.';
+      if (chosen.promoCode) {
+        line += ' Founding price for ' + plan.offerPrice.months + ' months, then ' +
+          plan.offerPrice.thenPrice + ' / ' + plan.period + '.';
+      }
+      text(checkoutPlan, line);
+
+      checkout.hidden = false;
+      checkout.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document.getElementById('email').focus({ preventScroll: true });
+    });
+
+    return button;
+  }
+
+  fetch(API + '/billing/plans', { headers: { Accept: 'application/json' } })
+    .then(function (r) {
+      if (!r.ok) throw new Error('plans ' + r.status);
+      return r.json();
+    })
+    .then(function (data) {
+      var paid = (data.plans || []).filter(function (p) { return p.id !== 'free'; });
+      if (paid.length === 0) throw new Error('no plans');
+
+      showOffer(data);
+      paid.forEach(function (plan) { cardsEl.appendChild(planCard(plan)); });
+
+      /*
+       * Said only when it is true. An Upgrade button that cannot charge anything
+       * is worse than no button.
+       */
+      if (data.checkoutAvailable === false) {
+        text(
+          statusEl,
+          'Payments are not open yet. Write to hello@zoxia.site and we will tell you the day they are.'
+        );
+        Array.prototype.forEach.call(cardsEl.querySelectorAll('button'), function (b) {
+          b.disabled = true;
+        });
+      } else {
+        statusEl.hidden = true;
+      }
+    })
+    .catch(function () {
+      statusEl.className = 'note note-bad';
+      text(
+        statusEl,
+        'Plans could not be loaded just now. Refresh the page, or write to hello@zoxia.site and we will sort it out.'
+      );
+    });
+
+  /* -------------------------------------------------------------- checkout -- */
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    if (!chosen) return;
+
+    var email = document.getElementById('email').value.trim();
+    var password = document.getElementById('password').value;
+
+    if (!email || !password) {
+      fail('Enter your email and password to continue.');
+      return;
+    }
+
+    clearError();
+    submit.disabled = true;
+    submit.classList.add('loading');
+
+    function done() {
+      submit.disabled = false;
+      submit.classList.remove('loading');
+    }
+
+    /*
+     * Sign in, then start the payment.
+     *
+     * The token goes into sessionStorage for one reason: the next thing that
+     * happens is a redirect to Paystack and back, and the page they come back to
+     * has to be able to ask us whether the payment landed. sessionStorage rather
+     * than localStorage or a cookie, so it belongs to this tab, dies when the tab
+     * does, and is deleted by the page that reads it.
+     */
+    fetch(API + '/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, password: password })
+    })
+      .then(function (r) {
+        return asJson(r, 'We could not sign you in just now. Nothing has been charged.');
+      })
+      .then(function (auth) {
+        try {
+          sessionStorage.setItem('zoxia.checkout', auth.accessToken);
+        } catch (e) {
+          /*
+           * Private browsing, or storage refused. Not fatal: the payment still
+           * works and the webhook still activates the plan. The return page just
+           * cannot confirm it and says so rather than guessing.
+           */
+        }
+
+        var body = {
+          planId: chosen.planId,
+          withX: chosen.withX,
+          callbackUrl: 'https://zoxia.site/paid'
+        };
+        if (chosen.promoCode) body.promoCode = chosen.promoCode;
+
+        return fetch(API + '/billing/initialize', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + auth.accessToken
+          },
+          body: JSON.stringify(body)
+        }).then(function (r) {
+          return asJson(r, 'The payment could not be started. Nothing has been charged.');
+        });
+      })
+      .then(function (result) {
+        var url = result.authorizationUrl || result.authorization_url;
+        if (!url) throw new Error('No checkout link came back. Nothing has been charged.');
+        window.location.href = url;
+      })
+      .catch(function (err) {
+        fail(err.message || 'Something went wrong. Nothing has been charged.');
+        done();
+      });
+  });
+})();
+</script>
+
+</body>
+</html>
