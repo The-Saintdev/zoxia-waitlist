@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>Zoxia, scheduling that confirms the post went out</title>
-  <meta name="description" content="Zoxia posts to TikTok, X and LinkedIn from one place, then asks each platform whether it actually published. When one refuses, you are told which and why. Join the waitlist.">
+  <meta name="description" content="Zoxia posts to TikTok, YouTube, X and LinkedIn from one place, then asks each platform whether it actually published. When one refuses, you are told which and why. Join the waitlist.">
   <link rel="canonical" href="https://zoxia.site/">
 
   <!-- Open Graph -->
@@ -61,7 +61,7 @@
          .grid   faint graph paper, masked so it fades out at the edges
                  instead of stopping at a hard line.
          .float  small tiles carrying the things this product deals with,
-                 the three platforms and the two answers they give. Real
+                 the four platforms and the two answers they give. Real
                  marks, not abstract shapes.
 
        Still no colour washes. The grid is a pattern and the tiles are
@@ -234,7 +234,7 @@
 
     /* -------------------------------------------------------- the record band --
        A flat mint panel with one white card on it. The card is a record of
-       what three platforms said, not a mock of an app that is not public. */
+       what four platforms said, not a mock of an app that is not public. */
     .band { padding-block: 54px; }
     @media (min-width: 900px) { .band { padding-block: 76px; } }
 
@@ -699,7 +699,7 @@
       <div class="wrap">
         <h1>Your posts actually go out.</h1>
         <p class="hero-sub">
-          Zoxia posts to TikTok, X and LinkedIn, then asks each one whether it
+          Zoxia posts to TikTok, YouTube, X and LinkedIn, then asks each one whether it
           published. <strong>When one refuses, you hear it from us.</strong>
         </p>
 
@@ -722,6 +722,7 @@
           <span class="works-label">Posts to</span>
           <span class="works-logos">
             <svg viewBox="0 0 24 24" role="img" aria-label="TikTok"><title>TikTok</title><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+            <svg viewBox="0 0 24 24" role="img" aria-label="YouTube"><title>YouTube</title><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
             <svg viewBox="0 0 24 24" role="img" aria-label="X" class="is-x"><title>X</title><path d="M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z"/></svg>
             <svg viewBox="0 0 24 24" role="img" aria-label="LinkedIn"><title>LinkedIn</title><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
           </span>
@@ -761,6 +762,15 @@
             <span class="row-time" style="--d:560ms">11:06</span>
           </div>
 
+          <div class="row">
+            <span class="row-dest">YouTube</span>
+            <span class="row-state is-ok" style="--d:780ms">
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 5" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              confirmed
+            </span>
+            <span class="row-time" style="--d:780ms">11:07</span>
+          </div>
+
           <div class="row has-reason">
             <span class="row-dest">X</span>
             <span class="row-state is-no" style="--d:1000ms">
@@ -773,7 +783,7 @@
         </figure>
 
         <p class="band-note">
-          An example. Two went out, one did not, and you did not have to open three
+          An example. Three went out, one did not, and you did not have to open four
           apps to find out.
         </p>
       </div>
