@@ -24,9 +24,9 @@ import { existsSync } from 'node:fs';
  * require a **publicly reachable** privacy policy, and ours was a 404: it lived
  * in the Website/ directory, which is not what zoxia.site serves.
  *
- * `styles.css` and `favicon.png` come with them. They are the Website/ design
- * rather than the waitlist's, which is a visible seam and a smaller problem than
- * an unstyled policy or a missing one.
+ * They are built on , the one design system every page links, so
+ * there is no longer a second design on the pages a cautious customer and a
+ * Google auditor both read closely.
  *
  * `pricing.html` is deliberately not here. The plans page is built and not
  * launched, and the nav link to it has been removed from these pages rather than
@@ -35,7 +35,8 @@ import { existsSync } from 'node:fs';
 const FILES = [
   'index.html',
   'app.js',
-  'styles.css',
+  // The one design system, linked by every page.
+  'site.css',
   'favicon.png',
   'support.html',
   // The plans page and the page Paystack returns to. They ship together or the

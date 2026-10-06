@@ -5,28 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Payment | Zoxia</title>
 <meta name="description" content="What happened to your payment, and what to do next.">
-<link rel="icon" href="favicon.png" sizes="any">
+<link rel="icon" href="/assets/mark.png" sizes="any">
 <link rel="canonical" href="https://zoxia.site/paid">
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="/site.css">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 
-<div class="backdrop" aria-hidden="true"><span></span><span></span></div>
 
-<header>
-  <div class="bar">
-    <a class="brand" href="/"><img src="/favicon.png" alt="" width="24" height="24">Zoxia</a>
-    <nav aria-label="Primary">
-      <a href="/pricing">Plans</a>
-      <a href="/support">Support</a>
-    </nav>
-  </div>
-</header>
+<header class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="/" aria-label="Zoxia, home">
+        <img class="brand-mark" src="/assets/mark.png" width="96" height="81" alt="" decoding="async">
+        <span class="brand-name">Zoxia</span>
+      </a>
+    </div>
+  </header>
 
-<main id="main">
+<main id="main" class="page">
   <div class="wrap">
+    <article class="prose">
 
     <h1 id="title">Checking your payment</h1>
     <p class="lede" id="body">One moment.</p>
@@ -44,19 +43,18 @@
 
     <p class="note" id="ref-line" hidden><code id="ref"></code></p>
 
+    </article>
   </div>
 </main>
 
-<footer>
-  <div class="bar">
-    <p class="legal-line">
-      Zoxia is a product of Cresco Ai LTD, Nigeria.
-    </p>
-    <nav aria-label="Legal">
-      <a href="/legal/privacy">Privacy Policy</a>
-      <a href="/legal/terms">Terms of Service</a>
+<footer class="foot">
+  <div class="wrap foot-inner">
+    <span>Zoxia, by Cresco Ai LTD</span>
+    <span class="foot-links">
+      <a href="/legal/privacy">Privacy</a>
+      <a href="/legal/terms">Terms</a>
       <a href="/support">Support</a>
-    </nav>
+    </span>
   </div>
 </footer>
 

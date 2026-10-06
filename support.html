@@ -5,33 +5,36 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Support | Zoxia</title>
 <meta name="description" content="How to reach a person at Zoxia, and what to include so we can help quickly.">
-<link rel="icon" href="favicon.png" sizes="any">
+<link rel="icon" href="/assets/mark.png" sizes="any">
 <link rel="canonical" href="https://zoxia.site/support">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Zoxia">
 <meta property="og:title" content="Support | Zoxia">
 <meta property="og:description" content="How to reach a person at Zoxia, and what to include so we can help quickly.">
 <meta property="og:url" content="https://zoxia.site/support">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="/site.css">
 </head>
 <body>
-<a class="skip" href="#main">Skip to content</a>
+<a class="sr-only" href="#main">Skip to content</a>
 
-<div class="backdrop" aria-hidden="true"><span></span><span></span></div>
 
-<header>
-  <div class="bar">
-    <a class="brand" href="/"><img src="/favicon.png" alt="" width="24" height="24">Zoxia</a>
-    <nav aria-label="Primary">
-      <a href="/legal/privacy">Privacy</a>
-      <a href="/legal/terms">Terms</a>
-      <a href="/support" aria-current="page">Support</a>
-    </nav>
-  </div>
-</header>
+<header class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="/" aria-label="Zoxia, home">
+        <img class="brand-mark" src="/assets/mark.png" width="96" height="81" alt="" decoding="async">
+        <span class="brand-name">Zoxia</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="/legal/privacy">Privacy</a>
+        <a href="/legal/terms">Terms</a>
+        <a href="/support" aria-current="page">Support</a>
+      </nav>
+    </div>
+  </header>
 
-<main id="main">
+<main id="main" class="page">
   <div class="wrap">
+    <article class="prose">
 
     <h1>Support</h1>
     <p class="lede">
@@ -160,21 +163,23 @@
     <h3>How do I delete everything?</h3>
     <p><a href="/legal/delete-account">Here.</a> It takes one screen in the app.</p>
 
+    </article>
   </div>
 </main>
 
-<footer>
-  <div class="bar">
-    <p class="legal-line">
-      Zoxia is a product of Cresco Ai LTD, Nigeria.<br>
-      TikTok, LinkedIn and X are trademarks of their respective owners and do not endorse Zoxia.
-    </p>
-    <nav aria-label="Legal">
-      <a href="/legal/privacy">Privacy Policy</a>
-      <a href="/legal/terms">Terms of Service</a>
+<footer class="foot">
+  <div class="wrap foot-inner">
+    <span>Zoxia, by Cresco Ai LTD</span>
+    <span class="foot-links">
+      <a href="/legal/privacy">Privacy</a>
+      <a href="/legal/terms">Terms</a>
       <a href="/support">Support</a>
       <a href="mailto:hello@zoxia.site">hello@zoxia.site</a>
-    </nav>
+    </span>
+    <p class="foot-legal">
+      TikTok, LinkedIn, YouTube and X are trademarks of their respective owners and do not
+      endorse Zoxia.
+    </p>
   </div>
 </footer>
 
