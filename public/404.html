@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page not found | Zoxia</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/assets/mark.png" sizes="any">
+<link rel="stylesheet" href="/site.css">
+<style>
+  /* Centred in the viewport rather than sitting at the top of an empty page,
+     which is the one layout a 404 cannot get wrong. */
+  .lost {
+    min-height: calc(100vh - var(--nav-h) - var(--nav-gap) * 2 - 140px);
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding-block: 48px;
+  }
+  .lost-inner { max-width: 54ch; }
+  .lost h1 {
+    font-size: clamp(32px, 5.4vw, 46px);
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+    font-weight: 700;
+  }
+  .lost p { margin-top: 16px; font-size: 18px; color: var(--ink-2); }
+  .lost-actions { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+</style>
+</head>
+<body>
+<a class="sr-only" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="/" aria-label="Zoxia, home">
+      <img class="brand-mark" src="/assets/mark.png" width="96" height="81" alt="" decoding="async">
+      <span class="brand-name">Zoxia</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="/legal/privacy">Privacy</a>
+      <a href="/legal/terms">Terms</a>
+      <a href="/support">Support</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="lost">
+  <div class="wrap lost-inner">
+    <h1>There is nothing here</h1>
+    <p>
+      That address does not point at anything. It may have been a receipt link that was
+      withdrawn, or a page that has moved.
+    </p>
+    <div class="lost-actions">
+      <a class="btn btn-primary" href="/">Go to the homepage</a>
+      <a class="btn btn-outline" href="/support">Get in touch</a>
+    </div>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-inner">
+    <span>Zoxia, by Cresco Ai LTD</span>
+    <span class="foot-links">
+      <a href="/legal/privacy">Privacy</a>
+      <a href="/legal/terms">Terms</a>
+      <a href="/support">Support</a>
+      <a href="mailto:hello@zoxia.site">hello@zoxia.site</a>
+    </span>
+  </div>
+</footer>
+
+</body>
+</html>

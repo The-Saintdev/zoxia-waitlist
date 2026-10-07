@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Receipt pages are a creator's private link to a client. They are served with
+# X-Robots-Tag: noindex by the Worker as well, because a robots rule is a
+# request and a header is not.
+Disallow: /r/
+
+Sitemap: https://zoxia.site/sitemap.xml

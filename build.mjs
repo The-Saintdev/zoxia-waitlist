@@ -43,6 +43,10 @@ const FILES = [
   // second half of a payment is a 404.
   'pricing.html',
   'paid.html',
+  // Crawl plumbing, and the page every wrong address lands on.
+  '404.html',
+  'robots.txt',
+  'sitemap.xml',
 ];
 const DIRS = ['assets', 'r', 'legal'];
 const OUT = 'public';

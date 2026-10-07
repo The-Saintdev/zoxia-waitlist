@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Extensionless, because Cloudflare's asset handler 307s the .html form and a
+  sitemap full of redirects is a sitemap that wastes every crawl.
+
+  The plans page is deliberately absent: it carries noindex until we launch,
+  and listing a page we have asked not to be indexed is an instruction
+  arguing with itself.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://zoxia.site/</loc><lastmod>2026-10-06</lastmod></url>
+  <url><loc>https://zoxia.site/legal/privacy</loc><lastmod>2026-10-06</lastmod></url>
+  <url><loc>https://zoxia.site/legal/terms</loc><lastmod>2026-10-06</lastmod></url>
+  <url><loc>https://zoxia.site/legal/delete-account</loc><lastmod>2026-10-06</lastmod></url>
+  <url><loc>https://zoxia.site/support</loc><lastmod>2026-10-06</lastmod></url>
+</urlset>

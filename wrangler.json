@@ -5,10 +5,14 @@
   "compatibility_date": "2024-08-01",
   "assets": {
     "directory": "./public",
-    "binding": "ASSETS"
+    "binding": "ASSETS",
+    "not_found_handling": "404-page"
   },
   "kv_namespaces": [
-    { "binding": "WAITLIST_KV", "id": "b3d7724ca5a94e9885ada5a95b361d38" }
+    {
+      "binding": "WAITLIST_KV",
+      "id": "b3d7724ca5a94e9885ada5a95b361d38"
+    }
   ],
   "keep_vars": true
 }
